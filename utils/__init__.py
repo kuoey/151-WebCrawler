@@ -1,3 +1,5 @@
+# Eric Kuo
+
 import os
 import logging
 from hashlib import sha256
