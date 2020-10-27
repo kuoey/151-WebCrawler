@@ -1,26 +1,48 @@
 import re
 from urllib.parse import urlparse
+from bs4 import BeautifulSoup
+crawled_url = list()
 
 
 def scraper(url, resp):
-    '''
-
-    :param url: The URL that was added to the frontier, and downloaded from the cache. It is of type str and was an url that was previously added to the frontier.
-    :param resp: This is the response given by the caching server for the requested URL. The response is an object of type Response
-    :return:
-    '''
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 
 
 def extract_next_links(url, resp):
-    # Implementation requred.
-    return list()
+    # Implementation required.
+    parsed = urlparse(url)
+    links = list()
+    # 200 OK,201 Creat,202 Accepted
+    if is_valid(url) and 200 <= resp.status <= 202 and url not in crawled_url:
+        crawled_url.append(url)
+        # read the page and save all urls that haven't been crawled.
+        html_doc = resp.raw_response.content
+        soup = BeautifulSoup(html_doc, 'html.parser')
+        for p in soup.find_all('a'):
+            relative_url = p.get('href')
+            if relative_url not in crawled_url:
+                links.append(relative_url)
+    return links
+
+
+def check_domain(url):
+    valid_domain = ["ics.uci.edu/", "cs.uci.edu/",
+                    "informatics.uci.edu/", "stat.uci.edu/"]
+    netloc = url.netloc + "/"
+    for i in valid_domain:
+        if netloc in i:
+            return True
+    if netloc == "today.uci.edu/" and "/department/information_computer_sciences" in url.path:
+        return True
+    return False
 
 
 def is_valid(url):
     try:
         parsed = urlparse(url)
+        if not check_domain(parsed):
+            return False
         if parsed.scheme not in set(["http", "https"]):
             return False
         return not re.match(
