@@ -18,6 +18,13 @@ def extract_next_links(url, resp):
         crawled_url.append(url)
         # read the page and save all urls that haven't been crawled.
         html_doc = resp.raw_response.content
+        # put the html_doc variable contents into a file along with parsed
+        f = open("storeDocument.txt", "a")  # argument a is for "append", change to "w" if you want to write over file
+        # write the url followed by the contents of the page
+        f.write(parsed.geturl())
+        f.write(html_doc)
+        f.close()
+
         soup = BeautifulSoup(html_doc, 'html.parser')
         for p in soup.find_all('a'):
             relative_url = p.get('href')
