@@ -1,4 +1,5 @@
 import re
+from PartA import *
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 crawled_url = list()
