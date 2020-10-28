@@ -104,7 +104,7 @@ def simple_tokenize(tokens):
     while counter < len(tokens):
         res = re.sub(r'[^A-Za-z0-9]', '', tokens[counter])  # Use regex to remove non alpha numerics
         res = res.lower()
-        print("res: {}".format(res))
+        #print("res: {}".format(res))
         if res == '' or res in commonList:  # Does not allow blank tokens or common words
             tokens.pop(counter)
         else:
@@ -136,11 +136,21 @@ def print50(freqMap):
         counter += 1
 
 
+# Demo for combining multiple lists of words into 1 dictionary
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print('Error: Incorrect number of arguments.')
-        sys.exit()
+    bigBook = {}     # Initially empty dictionary, it will store the count of all words processed
 
-    tokens1 = tokenize(sys.argv[1])
-    freq1 = computeWordFrequencies(tokens1)
-    aPrint(freq1)
+    list1 = ['@#%^$', 'Word', 'Words!', '沼', 'te沼st', '1991اف_جي2']
+    list2 = ['wOrD', 'JeReMy', '121*@#', 'pu#$ll', '#3PuSh', 'test', 'testing']
+
+    # The first list goes through simple_tokenize function to get correct tokens
+    list1 = simple_tokenize(list1)
+    # The list is then fed to the dictionary bigBook using the combineFreq function
+    bigBook = combineFreq(list1, bigBook)
+
+    # Same thing is done with second list
+    list2 = simple_tokenize(list2)
+    bigBook = combineFreq(list2, bigBook)
+
+    # After all the lists are combined, we can print the top 50 using print50
+    print50(bigBook)
