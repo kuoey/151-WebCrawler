@@ -4,6 +4,11 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 crawled_url = list()
 
+#test for eric
+
+returnLink = ""
+
+maximumWordCount = 0
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -11,6 +16,8 @@ def scraper(url, resp):
 
 
 def extract_next_links(url, resp):
+    global returnLink
+    global maximumWordCount
     # Implementation required.
     parsed = urlparse(url)
     links = list()
@@ -27,6 +34,13 @@ def extract_next_links(url, resp):
         f.close()
 
         soup = BeautifulSoup(html_doc, 'html.parser')
+        #this loop gets the maximum word count from all the url 
+        s = soup.get_text()
+        tempWC = len(s)
+        if tempWC > maximumWordCount:
+            maximumWordCount = tempWC
+            returnLink = url
+
         for p in soup.find_all('a'):
             relative_url = p.get('href')
             if relative_url not in crawled_url:
