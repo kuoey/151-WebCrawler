@@ -21,8 +21,12 @@ def extract_next_links(url, resp):
     # Implementation required.
     parsed = urlparse(url)
     links = list()
+    print("extract links")
+    print(url)
+    print(is_valid(url),resp.status,url not in crawled_url)
     # 200 OK,201 Creat,202 Accepted
     if is_valid(url) and 200 <= resp.status <= 202 and url not in crawled_url:
+        print("isvalid")
         crawled_url.append(url)
         # read the page and save all urls that haven't been crawled.
         html_doc = resp.raw_response.content
@@ -30,17 +34,21 @@ def extract_next_links(url, resp):
         f = open("storeDocument.txt", "a")  # argument a is for "append", change to "w" if you want to write over file
         # write the url followed by the contents of the page
         f.write(parsed.geturl())
-        f.write(html_doc)
-        f.close()
+        #f.write(html_doc)
+        #f.close()
 
         soup = BeautifulSoup(html_doc, 'html.parser')
-        #this loop gets the maximum word count from all the url 
+        #this loop gets the maximum word count from all the url
         s = soup.get_text()
+        f.write(s)
+        f.close()
+
         tempWC = len(s)
         if tempWC > maximumWordCount:
             maximumWordCount = tempWC
             returnLink = url
-
+        print("Max word:", maximumWordCount)
+        print("Max word link:",returnLink)
         for p in soup.find_all('a'):
             relative_url = p.get('href')
             if relative_url not in crawled_url:
@@ -48,16 +56,22 @@ def extract_next_links(url, resp):
     return links
 
 
+
 def check_domain(url):
     valid_domain = ["ics.uci.edu/", "cs.uci.edu/",
                     "informatics.uci.edu/", "stat.uci.edu/"]
-    netloc = url.netloc + "/"
+    print(url.netloc)
+    try:
+        netloc = url.netloc[5:] + "/"
+    except:
+        return False
     for i in valid_domain:
         if netloc in i:
             return True
     if netloc == "today.uci.edu/" and "/department/information_computer_sciences" in url.path:
         return True
     return False
+
 
 
 def is_valid(url):
