@@ -61,13 +61,36 @@ def check_domain(url):
     valid_domain = ["ics.uci.edu/", "cs.uci.edu/",
                     "informatics.uci.edu/", "stat.uci.edu/"]
     print(url.netloc)
+    if len(url.netloc)<=3 :
+        return False
     try:
-        netloc = url.netloc[5:] + "/"
+        # test= url.netloc[5:]
+        netloc = url.netloc + "/"
+        if netloc.startswith("www."):
+            netloc = netloc.strip("www.")
     except:
         return False
+
+    if netloc == "wics.ics.uci.edu/" and "/events" in url.path.lower():
+        return False
+    if "/pdf" in url.path.lower():
+        return False
+    if netloc == "archive.ics.uci.edu":
+        return False
+
+    if netloc == "hack.ics.uci.edu" and "gallery" in url.path:
+        return False
+
+    if netloc == "grape.ics.uci.edu":
+        return False
+
+    if netloc == "intranet.ics.uci.edu":
+        return False
+
     for i in valid_domain:
         if netloc in i:
             return True
+
     if netloc == "today.uci.edu/" and "/department/information_computer_sciences" in url.path:
         return True
     return False
