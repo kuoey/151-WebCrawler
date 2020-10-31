@@ -129,8 +129,9 @@ def print50(freqMap):
                      key=operator.itemgetter(1))  # https://docs.python.org/2/howto/sorting.html
     counter = 1
     for entry in dSorted:
-        # print("{}: ".format(counter), end='')  # Code to test number of entries
-        print(entry[0])
+        print("{}: {} => {}".format(counter, entry[0], entry[1]))  # Code to test number of entries
+        
+		# print(entry[0])
         if counter == 50:
             break
         counter += 1

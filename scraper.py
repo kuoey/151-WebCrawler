@@ -9,15 +9,21 @@ crawled_url = list()
 returnLink = ""
 
 maximumWordCount = 0
+bigBook = {}
 
 def scraper(url, resp):
+    global bigBook
+
     links = extract_next_links(url, resp)
+    print50(bigBook)
     return [link for link in links if is_valid(link)]
 
 
 def extract_next_links(url, resp):
     global returnLink
     global maximumWordCount
+    global bigBook
+
     # Implementation required.
     parsed = urlparse(url)
     links = list()
@@ -43,12 +49,18 @@ def extract_next_links(url, resp):
         f.write(s)
         f.close()
 
-        tempWC = len(s)
+        # Saving for top 50 words
+        wordList = simple_tokenize(s.split())
+        bigBook = combineFreq(wordList, bigBook)
+        # TODO Take this out
+        print50(bigBook)
+        # Largest Page
+        tempWC = len(wordList)
         if tempWC > maximumWordCount:
             maximumWordCount = tempWC
             returnLink = url
         print("Max word:", maximumWordCount)
-        print("Max word link:",returnLink)
+        print("Max word link:", returnLink)
         for p in soup.find_all('a'):
             relative_url = p.get('href')
             if relative_url not in crawled_url:
