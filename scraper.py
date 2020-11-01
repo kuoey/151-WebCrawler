@@ -2,28 +2,25 @@ import re
 from PartA import *
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
-crawled_url = list()
-
+crawled_url = set()
+uniq_url=set()
+subdomain=dict()
 #test for eric
-
 returnLink = ""
 
 maximumWordCount = 0
-bigBook = {}
 
 def scraper(url, resp):
-    global bigBook
 
     links = extract_next_links(url, resp)
-    print50(bigBook)
+    print("Sub:",subdomain.items())
+    print(uniq_url)
     return [link for link in links if is_valid(link)]
 
 
 def extract_next_links(url, resp):
     global returnLink
     global maximumWordCount
-    global bigBook
-
     # Implementation required.
     parsed = urlparse(url)
     links = list()
@@ -33,40 +30,43 @@ def extract_next_links(url, resp):
     # 200 OK,201 Creat,202 Accepted
     if is_valid(url) and 200 <= resp.status <= 202 and url not in crawled_url:
         print("isvalid")
-        crawled_url.append(url)
+        crawled_url.add(url)
+
         # read the page and save all urls that haven't been crawled.
         html_doc = resp.raw_response.content
         # put the html_doc variable contents into a file along with parsed
         f = open("storeDocument.txt", "a")  # argument a is for "append", change to "w" if you want to write over file
         # write the url followed by the contents of the page
         f.write(parsed.geturl())
-        #f.write(html_doc)
-        #f.close()
+        # f.write(html_doc)
+        # f.close()
 
         soup = BeautifulSoup(html_doc, 'html.parser')
-        #this loop gets the maximum word count from all the url
+        # this loop gets the maximum word count from all the url
         s = soup.get_text()
         f.write(s)
         f.close()
 
-        # Saving for top 50 words
-        wordList = simple_tokenize(s.split())
-        bigBook = combineFreq(wordList, bigBook)
-        # TODO Take this out
-        print50(bigBook)
-        # Largest Page
-        tempWC = len(wordList)
+        tempWC = len(s)
         if tempWC > maximumWordCount:
             maximumWordCount = tempWC
             returnLink = url
         print("Max word:", maximumWordCount)
         print("Max word link:", returnLink)
+        print(parsed.netloc)
+        suburl = url.replace(parsed.path, '')
+        uniq_url.add(suburl)
+
+        print(subdomain.keys(), "----------------------")
+        if ".ics.uci.edu" in parsed.netloc and suburl != "http://www.ics.uci.edu" and suburl != "https://www.ics.uci.edu" and suburl not in subdomain.keys():
+            subdomain[suburl] = set()
         for p in soup.find_all('a'):
             relative_url = p.get('href')
+            if relative_url == '' and relative_url != None and suburl in subdomain.keys():
+                subdomain[suburl].add(urlparse(relative_url).netloc)
             if relative_url not in crawled_url:
                 links.append(relative_url)
     return links
-
 
 
 def check_domain(url):
