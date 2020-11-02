@@ -9,18 +9,23 @@ subdomain=dict()
 returnLink = ""
 
 maximumWordCount = 0
+bigBook = {}
 
 def scraper(url, resp):
+    global bigBook
 
     links = extract_next_links(url, resp)
-    print("Sub:",subdomain.items())
+    for i, j in sorted(subdomain.items()):
+        print(i, ": ", len(j))
     print(uniq_url)
+    print50(bigBook)
     return [link for link in links if is_valid(link)]
 
 
 def extract_next_links(url, resp):
     global returnLink
     global maximumWordCount
+    global bigBook
     # Implementation required.
     parsed = urlparse(url)
     links = list()
@@ -47,7 +52,13 @@ def extract_next_links(url, resp):
         f.write(s)
         f.close()
 
-        tempWC = len(s)
+        # Saving for top 50 words
+        wordList = simple_tokenize(s.split())
+        bigBook = combineFreq(wordList, bigBook)
+        # TODO Take this out
+        print50(bigBook)
+        # Largest Page
+        tempWC = len(wordList)
         if tempWC > maximumWordCount:
             maximumWordCount = tempWC
             returnLink = url
