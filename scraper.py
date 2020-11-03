@@ -2,44 +2,60 @@ import re
 from PartA import *
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
+
 crawled_url = set()
-uniq_url=set()
-subdomain=dict()
+uniq_url = set()
+subdomain = dict()
 returnLink = ""
 
 maximumWordCount = 0
 bigBook = {}
 
-def scraper(url, resp):
-    global bigBook
 
-    links = extract_next_links(url, resp)
+def scraper(url, resp):
+    """
+    :param url: given url
+    :param resp: response from the website
+    :return:
+    """
+    global bigBook  # used for the word dictionary for frequencies
+
+    links = extract_next_links(url, resp)  # all relative url put into links
+
     print("New test starts here")
     print(subdomain.items())
-    for i in sorted (subdomain.keys()):
-        print(i,":", len(subdomain[i]))
+    # count of all the subdomains (question #4)
+    for i in sorted(subdomain.keys()):
+        print(i, ":", len(subdomain[i]))
 
     # for i, j in sorted(subdomain.items()):
-        # print(i, ", ", len(j), ": ", j)
-    print(len(uniq_url))
-    print(uniq_url)
-    print50(bigBook)
+    # print(i, ", ", len(j), ": ", j)
+    print("Total number of unique urls: ", len(uniq_url))  # question #1 (how many unique url there is yuh)
+    # print(uniq_url)
+    print50(bigBook)  # prints top 50 most frequent words
     return [link for link in links if is_valid(link)]
 
 
 def extract_next_links(url, resp):
-    global returnLink
+    """
+    gets the link -lydia(2020)
+    :param url:
+    :param resp:
+    :return:  all relative url put into links
+    """
+    global returnLink  # link with the most words
     global maximumWordCount
-    global bigBook
+    global bigBook  # dictionary holding all the words/freq
     # Implementation required.
-    parsed = urlparse(url)
+    parsed = urlparse(url)  # parsed holds the url
     links = list()
     print("extract links")
     print(url)
-    print(is_valid(url),resp.status,url not in crawled_url)
-    # 200 OK,201 Creat,202 Accepted
+    print(is_valid(url), resp.status, url not in crawled_url)  # testing purposes
+    # 200 OK,201 Create,202 Accepted
     if is_valid(url) and 200 <= resp.status <= 202 and url not in crawled_url:
-        print("isvalid")
+        # url passes all tests and is valid
+        print("is valid")
         crawled_url.add(url)
 
         # read the page and save all urls that haven't been crawled.
@@ -48,7 +64,7 @@ def extract_next_links(url, resp):
         f = open("storeDocument.txt", "a")  # argument a is for "append", change to "w" if you want to write over file
         # write the url followed by the contents of the page
         f.write(parsed.geturl())
-        # f.write(html_doc)
+
         # f.close()
 
         soup = BeautifulSoup(html_doc, 'html.parser')
@@ -60,8 +76,8 @@ def extract_next_links(url, resp):
         # Saving for top 50 words
         wordList = simple_tokenize(s.split())
         bigBook = combineFreq(wordList, bigBook)
-        # TODO Take this out
-        print50(bigBook)
+        # TODO Take this out(done)
+        # print50(bigBook)
         # Largest Page
         tempWC = len(wordList)
         if tempWC > maximumWordCount:
@@ -70,16 +86,20 @@ def extract_next_links(url, resp):
         print("Max word:", maximumWordCount)
         print("Max word link:", returnLink)
         print(parsed.netloc)
-        suburl = url.replace(parsed.path, '')
+        suburl = url.replace(parsed.path, '')  # take out fragment
         uniq_url.add(suburl)
 
         print(subdomain.keys(), "----------------------")
+        # checks if domain is ics, then checks the suburl is not the main domain
+        # netloc is the domain
         if ".ics.uci.edu" in parsed.netloc and suburl != "http://www.ics.uci.edu" and suburl != "https://www.ics.uci.edu" and suburl not in subdomain.keys():
             subdomain[suburl] = set()
-        for p in soup.find_all('a'):
+        for p in soup.find_all('a'): # formatting (a means link)
             relative_url = p.get('href')
+            # check if relative url is valid then add to the set
             if relative_url is not None and len(relative_url) > 1 and suburl in subdomain.keys():
                 subdomain[suburl].add(urlparse(relative_url).netloc)
+
             if relative_url not in crawled_url:
                 links.append(relative_url)
         if suburl in subdomain.keys() and '' in subdomain[suburl]:
@@ -88,10 +108,15 @@ def extract_next_links(url, resp):
 
 
 def check_domain(url):
+    """
+    checks if domain is valid
+    :param url:
+    :return: yay or nay
+    """
     valid_domain = ["ics.uci.edu/", "cs.uci.edu/",
                     "informatics.uci.edu/", "stat.uci.edu/"]
     print(url.netloc)
-    if len(url.netloc)<=3 :
+    if len(url.netloc) <= 3:
         return False
     try:
         # test= url.netloc[5:]
@@ -124,7 +149,6 @@ def check_domain(url):
     if netloc == "today.uci.edu/" and "/department/information_computer_sciences" in url.path:
         return True
     return False
-
 
 
 def is_valid(url):

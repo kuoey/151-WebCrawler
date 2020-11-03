@@ -125,13 +125,18 @@ def combineFreq(tokenList, myBook):
 
 # Prints the top 50 common words from a dictionary
 def print50(freqMap):
+    """
+    given map, prints out the top 50 most frequent words
+    :param freqMap: map that maps words to their frequencies
+    :return: nothing
+    """
     dSorted = sorted(freqMap.items(), reverse=True,
                      key=operator.itemgetter(1))  # https://docs.python.org/2/howto/sorting.html
     counter = 1
     for entry in dSorted:
         print("{}: {} => {}".format(counter, entry[0], entry[1]))  # Code to test number of entries
         
-		# print(entry[0])
+        # print(entry[0])
         if counter == 50:
             break
         counter += 1
