@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 crawled_url = set()
 uniq_url=set()
 subdomain=dict()
-#test for eric
 returnLink = ""
 
 maximumWordCount = 0
@@ -15,8 +14,14 @@ def scraper(url, resp):
     global bigBook
 
     links = extract_next_links(url, resp)
-    for i, j in sorted(subdomain.items()):
-        print(i, ": ", len(j))
+    print("New test starts here")
+    print(subdomain.items())
+    for i in sorted (subdomain.keys()):
+        print(i,":", len(subdomain[i]))
+
+    # for i, j in sorted(subdomain.items()):
+        # print(i, ", ", len(j), ": ", j)
+    print(len(uniq_url))
     print(uniq_url)
     print50(bigBook)
     return [link for link in links if is_valid(link)]
@@ -73,10 +78,12 @@ def extract_next_links(url, resp):
             subdomain[suburl] = set()
         for p in soup.find_all('a'):
             relative_url = p.get('href')
-            if relative_url == '' and relative_url != None and suburl in subdomain.keys():
+            if relative_url is not None and len(relative_url) > 1 and suburl in subdomain.keys():
                 subdomain[suburl].add(urlparse(relative_url).netloc)
             if relative_url not in crawled_url:
                 links.append(relative_url)
+        if suburl in subdomain.keys() and '' in subdomain[suburl]:
+            subdomain[suburl].remove('')
     return links
 
 
