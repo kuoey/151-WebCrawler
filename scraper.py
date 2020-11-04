@@ -23,7 +23,7 @@ def scraper(url, resp):
     links = extract_next_links(url, resp)  # all relative url put into links
 
     print("New test starts here")
-    print(subdomain.items())
+    # print(subdomain.items())
     # count of all the subdomains (question #4)
     for i in sorted(subdomain.keys()):
         print(i, ":", len(subdomain[i]))
@@ -49,24 +49,20 @@ def extract_next_links(url, resp):
     # Implementation required.
     parsed = urlparse(url)  # parsed holds the url
     links = list()
-    print("extract links")
-    print(url)
-    print(is_valid(url), resp.status, url not in crawled_url)  # testing purposes
+    print("---------------------------------")
+    print("Current url:", url)
     # 200 OK,201 Create,202 Accepted
     if is_valid(url) and 200 <= resp.status <= 202 and url not in crawled_url:
         # url passes all tests and is valid
-        print("is valid")
         crawled_url.add(url)
 
         # read the page and save all urls that haven't been crawled.
         html_doc = resp.raw_response.content
         # put the html_doc variable contents into a file along with parsed
         f = open("storeDocument.txt", "a")  # argument a is for "append", change to "w" if you want to write over file
+        f1 = open("icsurl.txt","a")
         # write the url followed by the contents of the page
         f.write(parsed.geturl())
-
-        # f.close()
-
         soup = BeautifulSoup(html_doc, 'html.parser')
         # this loop gets the maximum word count from all the url
         s = soup.get_text()
@@ -85,25 +81,40 @@ def extract_next_links(url, resp):
             returnLink = url
         print("Max word:", maximumWordCount)
         print("Max word link:", returnLink)
-        print(parsed.netloc)
-        suburl = url.replace(parsed.path, '')  # take out fragment
-        uniq_url.add(suburl)
 
-        print(subdomain.keys(), "----------------------")
+        # suburl = url.replace(parsed.path, '')  # take out fragment
+        if len(parsed.scheme)>0:
+            suburl = parsed.scheme+"://"+parsed.netloc
+        else:
+            suburl = parsed.netloc
+        if parsed.fragment != '':
+            t= url.replace("#"+parsed.fragment,'')
+            uniq_url.add(t)
+        else:
+            uniq_url.add(url)
+        # f1.write(parsed.netloc + "\n")
+
+        print("Suburl:",suburl)
+        # print(subdomain.keys(), "----------------------")
         # checks if domain is ics, then checks the suburl is not the main domain
         # netloc is the domain
-        if ".ics.uci.edu" in parsed.netloc and suburl != "http://www.ics.uci.edu" and suburl != "https://www.ics.uci.edu" and suburl not in subdomain.keys():
+        if ".ics.uci.edu" in parsed.netloc and parsed.netloc != "www.ics.uci.edu" and suburl not in subdomain.keys():
+
             subdomain[suburl] = set()
         for p in soup.find_all('a'): # formatting (a means link)
             relative_url = p.get('href')
+            if parsed.netloc=="support.ics.uci.edu":
+                f1.write(relative_url + "\n")
             # check if relative url is valid then add to the set
             if relative_url is not None and len(relative_url) > 1 and suburl in subdomain.keys():
                 subdomain[suburl].add(urlparse(relative_url).netloc)
-
+            # print("relative url:",relative_url)
             if relative_url not in crawled_url:
+                # print("True:",relative_url)
                 links.append(relative_url)
         if suburl in subdomain.keys() and '' in subdomain[suburl]:
             subdomain[suburl].remove('')
+        f1.close()
     return links
 
 
@@ -115,7 +126,7 @@ def check_domain(url):
     """
     valid_domain = ["ics.uci.edu/", "cs.uci.edu/",
                     "informatics.uci.edu/", "stat.uci.edu/"]
-    print(url.netloc)
+    # print(url.netloc)
     if len(url.netloc) <= 3:
         return False
     try:
@@ -142,13 +153,14 @@ def check_domain(url):
     if netloc == "intranet.ics.uci.edu":
         return False
 
-    for i in valid_domain:
-        if netloc in i:
-            return True
+
 
     if netloc == "today.uci.edu/" and "/department/information_computer_sciences" in url.path:
         return True
-    return False
+    for i in valid_domain:
+        if i in netloc:
+            return True
+
 
 
 def is_valid(url):
