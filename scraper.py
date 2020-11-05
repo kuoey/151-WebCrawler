@@ -26,7 +26,7 @@ def scraper(url, resp):
     # print(subdomain.items())
     # count of all the subdomains (question #4)
     for i in sorted(subdomain.keys()):
-        print(i, ":", len(subdomain[i]))
+        print(i, ":", subdomain[i])
 
     # for i, j in sorted(subdomain.items()):
     # print(i, ", ", len(j), ": ", j)
@@ -60,7 +60,7 @@ def extract_next_links(url, resp):
         html_doc = resp.raw_response.content
         # put the html_doc variable contents into a file along with parsed
         f = open("storeDocument.txt", "a")  # argument a is for "append", change to "w" if you want to write over file
-        f1 = open("icsurl.txt","a")
+        #f1 = open("icsurl.txt","a")
         # write the url followed by the contents of the page
         f.write(parsed.geturl())
         soup = BeautifulSoup(html_doc, 'html.parser')
@@ -98,23 +98,25 @@ def extract_next_links(url, resp):
         # print(subdomain.keys(), "----------------------")
         # checks if domain is ics, then checks the suburl is not the main domain
         # netloc is the domain
-        if ".ics.uci.edu" in parsed.netloc and parsed.netloc != "www.ics.uci.edu" and suburl not in subdomain.keys():
-
-            subdomain[suburl] = set()
+        if ".ics.uci.edu" in parsed.netloc and parsed.netloc != "www.ics.uci.edu":
+            if suburl not in subdomain.keys():
+                subdomain[suburl] = 1
+            else:
+                subdomain[suburl]+=1
         for p in soup.find_all('a'): # formatting (a means link)
             relative_url = p.get('href')
-            if parsed.netloc=="support.ics.uci.edu":
-                f1.write(relative_url + "\n")
+            #if parsed.netloc=="support.ics.uci.edu":
+            #f1.write(relative_url)
             # check if relative url is valid then add to the set
-            if relative_url is not None and len(relative_url) > 1 and suburl in subdomain.keys():
-                subdomain[suburl].add(urlparse(relative_url).netloc)
+            # if relative_url is not None and len(relative_url) > 1 and suburl in subdomain.keys():
+            #     subdomain[suburl].add(urlparse(relative_url).netloc)
             # print("relative url:",relative_url)
             if relative_url not in crawled_url:
                 # print("True:",relative_url)
                 links.append(relative_url)
-        if suburl in subdomain.keys() and '' in subdomain[suburl]:
-            subdomain[suburl].remove('')
-        f1.close()
+        # if suburl in subdomain.keys() and '' in subdomain[suburl]:
+        #     subdomain[suburl].remove('')
+        #f1.close()
     return links
 
 
