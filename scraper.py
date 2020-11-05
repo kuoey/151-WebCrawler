@@ -22,17 +22,17 @@ def scraper(url, resp):
 
     links = extract_next_links(url, resp)  # all relative url put into links
 
-    print("New test starts here")
-    # print(subdomain.items())
-    # count of all the subdomains (question #4)
-    for i in sorted(subdomain.keys()):
-        print(i, ":", subdomain[i])
-
-    # for i, j in sorted(subdomain.items()):
-    # print(i, ", ", len(j), ": ", j)
-    print("Total number of unique urls: ", len(uniq_url))  # question #1 (how many unique url there is yuh)
-    # print(uniq_url)
-    print50(bigBook)  # prints top 50 most frequent words
+    # print("New test starts here")
+    # # print(subdomain.items())
+    # # count of all the subdomains (question #4)
+    # for i in sorted(subdomain.keys()):
+    #     print(i, ":", subdomain[i])
+    #
+    # # for i, j in sorted(subdomain.items()):
+    # # print(i, ", ", len(j), ": ", j)
+    # print("Total number of unique urls: ", len(uniq_url))  # question #1 (how many unique url there is yuh)
+    # # print(uniq_url)
+    # print50(bigBook)  # prints top 50 most frequent words
     return [link for link in links if is_valid(link)]
 
 
@@ -49,8 +49,9 @@ def extract_next_links(url, resp):
     # Implementation required.
     parsed = urlparse(url)  # parsed holds the url
     links = list()
-    print("---------------------------------")
-    print("Current url:", url)
+    
+    # print("---------------------------------")
+    # print("Current url:", url)
     # 200 OK,201 Create,202 Accepted
     if is_valid(url) and 200 <= resp.status <= 202 and url not in crawled_url:
         # url passes all tests and is valid
@@ -79,8 +80,8 @@ def extract_next_links(url, resp):
         if tempWC > maximumWordCount:
             maximumWordCount = tempWC
             returnLink = url
-        print("Max word:", maximumWordCount)
-        print("Max word link:", returnLink)
+        # print("Max word:", maximumWordCount)
+        # print("Max word link:", returnLink)
 
         # suburl = url.replace(parsed.path, '')  # take out fragment
         if len(parsed.scheme)>0:
@@ -94,7 +95,7 @@ def extract_next_links(url, resp):
             uniq_url.add(url)
         # f1.write(parsed.netloc + "\n")
 
-        print("Suburl:",suburl)
+        # print("Suburl:",suburl)
         # print(subdomain.keys(), "----------------------")
         # checks if domain is ics, then checks the suburl is not the main domain
         # netloc is the domain

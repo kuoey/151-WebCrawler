@@ -2,7 +2,7 @@ from threading import Thread
 
 from utils.download import download
 from utils import get_logger
-from scraper import scraper
+from scraper import scraper, subdomain, bigBook, print50, uniq_url, maximumWordCount, returnLink
 import time
 
 
@@ -18,6 +18,19 @@ class Worker(Thread):
             tbd_url = self.frontier.get_tbd_url()
             if not tbd_url:
                 self.logger.info("Frontier is empty. Stopping Crawler.")
+                print("New test starts here")
+                # print(subdomain.items())
+                # count of all the subdomains (question #4)
+                for i in sorted(subdomain.keys()):
+                    print(i, ":", subdomain[i])
+
+                # for i, j in sorted(subdomain.items()):
+                # print(i, ", ", len(j), ": ", j)
+                print("Total number of unique urls: ", len(uniq_url))  # question #1 (how many unique url there is yuh)
+                # print(uniq_url)
+                print50(bigBook)  # prints top 50 most frequent words
+                print("Max word:", maximumWordCount)
+                print("Max word link:", returnLink)
                 break
             resp = download(tbd_url, self.config, self.logger)
             self.logger.info(
