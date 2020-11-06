@@ -60,7 +60,7 @@ def extract_next_links(url, resp):
         html_doc = resp.raw_response.content
         # put the html_doc variable contents into a file along with parsed
         f = open("storeDocument.txt", "a")  # argument a is for "append", change to "w" if you want to write over file
-        #f1 = open("icsurl.txt","a")
+        # f1 = open("icsurl.txt","a")
         # write the url followed by the contents of the page
         f.write(parsed.geturl())
         soup = BeautifulSoup(html_doc, 'html.parser')
@@ -83,18 +83,18 @@ def extract_next_links(url, resp):
         print("Max word link:", returnLink)
 
         # suburl = url.replace(parsed.path, '')  # take out fragment
-        if len(parsed.scheme)>0:
-            suburl = parsed.scheme+"://"+parsed.netloc
+        if len(parsed.scheme) > 0:
+            suburl = parsed.scheme + "://" + parsed.netloc
         else:
             suburl = parsed.netloc
         if parsed.fragment != '':
-            t= url.replace("#"+parsed.fragment,'')
+            t = url.replace("#" + parsed.fragment, '')
             uniq_url.add(t)
         else:
             uniq_url.add(url)
         # f1.write(parsed.netloc + "\n")
 
-        print("Suburl:",suburl)
+        print("Suburl:", suburl)
         # print(subdomain.keys(), "----------------------")
         # checks if domain is ics, then checks the suburl is not the main domain
         # netloc is the domain
@@ -102,11 +102,11 @@ def extract_next_links(url, resp):
             if suburl not in subdomain.keys():
                 subdomain[suburl] = 1
             else:
-                subdomain[suburl]+=1
-        for p in soup.find_all('a'): # formatting (a means link)
+                subdomain[suburl] += 1
+        for p in soup.find_all('a'):  # formatting (a means link)
             relative_url = p.get('href')
-            #if parsed.netloc=="support.ics.uci.edu":
-            #f1.write(relative_url)
+            # if parsed.netloc=="support.ics.uci.edu":
+            # f1.write(relative_url)
             # check if relative url is valid then add to the set
             # if relative_url is not None and len(relative_url) > 1 and suburl in subdomain.keys():
             #     subdomain[suburl].add(urlparse(relative_url).netloc)
@@ -116,7 +116,7 @@ def extract_next_links(url, resp):
                 links.append(relative_url)
         # if suburl in subdomain.keys() and '' in subdomain[suburl]:
         #     subdomain[suburl].remove('')
-        #f1.close()
+        # f1.close()
     return links
 
 
@@ -146,23 +146,20 @@ def check_domain(url):
     if netloc == "archive.ics.uci.edu":
         return False
 
+    if netloc == "intranet.ics.uci.edu":
+        return False
+
     if netloc == "hack.ics.uci.edu" and "gallery" in url.path:
         return False
 
     if netloc == "grape.ics.uci.edu":
         return False
 
-    if netloc == "intranet.ics.uci.edu":
-        return False
-
-
-
     if netloc == "today.uci.edu/" and "/department/information_computer_sciences" in url.path:
         return True
     for i in valid_domain:
         if i in netloc:
             return True
-
 
 
 def is_valid(url):
