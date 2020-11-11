@@ -92,6 +92,6 @@ if __name__ == '__main__':
                     if i > 0:
                         print(",", end=" ")
                     print("(", z.docid, ",", z.tfidf, ")", end="")
-                    i += 1
+                    i += 1  # this is only for checking if a comma should be added, nothing else
 
                 print("]")
