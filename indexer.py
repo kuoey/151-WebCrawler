@@ -6,10 +6,11 @@ from PartA import *
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
-inverted_list=dict() #key= token, values = list(Posting)
-docid_n=0
+inverted_list = dict()  # key= token, values = list(Posting)
+docid_n = 0
 
-bigBook={}
+bigBook = {}
+
 
 class Posting(object):
 
@@ -26,6 +27,8 @@ class Posting(object):
         self.tfidf = tfidf
         self.fields = fields
         self.pos = pos
+
+
 def build_index(document):
     """
     Storing inverted_list as indexer.
@@ -35,11 +38,9 @@ def build_index(document):
 
     global bigBook
 
-
     with open(document)as f:
-        data=json.load(f)
+        data = json.load(f)
         print(data["content"])
-
 
     soup = BeautifulSoup(data["content"], 'html.parser')
 
@@ -48,14 +49,16 @@ def build_index(document):
     wordList = simple_tokenize(s.split())
     bigBook = combineFreq(wordList, bigBook)
     b_sorted = sorted(bigBook.items(), reverse=True,
-                     key=operator.itemgetter(1))
+                      key=operator.itemgetter(1))
     for token, freq in b_sorted:
         if token not in inverted_list.keys():
-            print(token,freq)
-            inverted_list[token]= list()
-        inverted_list[token].append(Posting(docid_n,freq,0,0))
+            print(token, freq)
+            inverted_list[token] = list()
+        inverted_list[token].append(Posting(docid_n, freq, 0, 0))
 
     f.close()
+
+
 # def parse_json(data):
 #     """
 #     Parse json file into contents that can read by simple_tokenize
@@ -63,18 +66,32 @@ def build_index(document):
 #     :return: list of words
 
 
-
 if __name__ == '__main__':
     """
     For M1 testing purpose
     """
     print("Enter directory:")
-    directory= input()
+    directory = input()
     for filename in os.listdir(directory):
-        abs_file_path = directory+"/"+filename
+        abs_file_path = directory + "/" + filename
         print(abs_file_path)
         if filename.endswith('.json'):
-            docid_n+=1
+            docid_n += 1
             build_index(abs_file_path)
             print50(bigBook)
-            print(inverted_list)
+
+            # print(inverted_list)
+
+            # print the keys, then the values (a list)
+            for x in inverted_list:
+                i = 0  # for checking if a comma needs to be printed
+                print(x, ": [", end=" ")
+
+                listOfPosting = inverted_list[x]
+                for z in listOfPosting:  # print the value(the list of posting)
+                    if i > 0:
+                        print(",", end=" ")
+                    print("(", z.docid, ",", z.tfidf, ")", end="")
+                    i += 1
+
+                print("]")
