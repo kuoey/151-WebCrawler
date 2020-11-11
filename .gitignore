@@ -112,3 +112,4 @@ venv.bak/
 .idea/misc.xml
 .idea/misc.xml
 .idea/151-WebCrawler.iml
+*.json
