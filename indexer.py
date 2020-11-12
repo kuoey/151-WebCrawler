@@ -5,6 +5,7 @@ import json
 from PartA import *
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
+# import pickle
 
 inverted_list = dict()  # key= token, values = list(Posting)
 docid_n = 0
@@ -70,6 +71,11 @@ if __name__ == '__main__':
     """
     For M1 testing purpose
     """
+    if os.path.exists("output.txt"):    # Resets the output file
+        os.remove("output.txt")
+
+    fileOUT = open("output.txt", "a")
+
     print("Enter directory:")
     directory = input()
     for folder in os.listdir(directory):    # Runs through each folder
@@ -83,18 +89,23 @@ if __name__ == '__main__':
                 build_index(final_path)
                 print50(bigBook)
 
-                # print(inverted_list)
+    # print(inverted_list)
 
-                # print the keys, then the values (a list)
-                for x in inverted_list:
-                    i = 0  # for checking if a comma needs to be printed
-                    print(x, ": [", end=" ")
+    # print the keys, then the values (a list)
+    for x in inverted_list:
+        i = 0  # for checking if a comma needs to be printed
+        print(x, ": [", end="")
+        fileOUT.write("{} [".format(x))
 
-                    listOfPosting = inverted_list[x]
-                    for z in listOfPosting:  # print the value(the list of posting)
-                        if i > 0:
-                            print(",", end=" ")
-                        print("(", z.docid, ",", z.tfidf, ")", end="")
-                        i += 1  # this is only for checking if a comma should be added, nothing else
+        listOfPosting = inverted_list[x]
+        for z in listOfPosting:  # print the value(the list of posting)
+            if i > 0:
+                print(",", end=" ")
+                fileOUT.write(",")
+            print("(", z.docid, ",", z.tfidf, ")", end="")
+            fileOUT.write("({},{})".format(str(z.docid), str(z.tfidf)))
+            i += 1  # this is only for checking if a comma should be added, nothing else
 
-                    print("]")
+        print("]")
+        fileOUT.write("]\n")
+    fileOUT.close()
