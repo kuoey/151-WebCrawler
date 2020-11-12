@@ -72,26 +72,29 @@ if __name__ == '__main__':
     """
     print("Enter directory:")
     directory = input()
-    for filename in os.listdir(directory):
-        abs_file_path = directory + "/" + filename
+    for folder in os.listdir(directory):    # Runs through each folder
+        abs_file_path = directory + "/" + folder    # Path to each folder within DEV folder
         print(abs_file_path)
-        if filename.endswith('.json'):
-            docid_n += 1
-            build_index(abs_file_path)
-            print50(bigBook)
+        for file in os.listdir(abs_file_path):  # Runs through each file in a folder
+            final_path = abs_file_path + "/" + file     # Path to json files in folders
+            print(final_path)
+            if file.endswith('.json'):
+                docid_n += 1
+                build_index(final_path)
+                print50(bigBook)
 
-            # print(inverted_list)
+                # print(inverted_list)
 
-            # print the keys, then the values (a list)
-            for x in inverted_list:
-                i = 0  # for checking if a comma needs to be printed
-                print(x, ": [", end=" ")
+                # print the keys, then the values (a list)
+                for x in inverted_list:
+                    i = 0  # for checking if a comma needs to be printed
+                    print(x, ": [", end=" ")
 
-                listOfPosting = inverted_list[x]
-                for z in listOfPosting:  # print the value(the list of posting)
-                    if i > 0:
-                        print(",", end=" ")
-                    print("(", z.docid, ",", z.tfidf, ")", end="")
-                    i += 1  # this is only for checking if a comma should be added, nothing else
+                    listOfPosting = inverted_list[x]
+                    for z in listOfPosting:  # print the value(the list of posting)
+                        if i > 0:
+                            print(",", end=" ")
+                        print("(", z.docid, ",", z.tfidf, ")", end="")
+                        i += 1  # this is only for checking if a comma should be added, nothing else
 
-                print("]")
+                    print("]")
