@@ -14,23 +14,24 @@ bigBook = {}
 token_num= set()
 
 
-class Posting(object):
+# class Posting(object):
+#
+#     def __init__(self, docid, tfidf, fields, pos):
+#         """
+#         Construct a new 'Posting' object.
+#         :param docid: Doc id, a int
+#         :param tfidf: Frequency count or TF-IDF
+#         :param fields: Fields, not in use yet
+#         :param pos: Positions, not in use yet
+#         :return: returns nothing
+#         """
+#         self.docid = docid
+#         self.tfidf = tfidf
+#         self.fields = fields
+#         self.pos = pos
 
-    def __init__(self, docid, tfidf, fields, pos):
-        """
-        Construct a new 'Posting' object.
-        :param docid: Doc id, a int
-        :param tfidf: Frequency count or TF-IDF
-        :param fields: Fields, not in use yet
-        :param pos: Positions, not in use yet
-        :return: returns nothing
-        """
-        self.docid = docid
-        self.tfidf = tfidf
-        self.fields = fields
-        self.pos = pos
-
-
+def posting(docid, tfidf):
+    return [docid, tfidf]
 def build_index(document):
     """
     Storing inverted_list as indexer.
@@ -61,15 +62,16 @@ def build_index(document):
         if token not in inverted_list.keys():
             # print(token, freq)
             inverted_list[token] = list()
-        inverted_list[token].append(Posting(docid_n, freq, 0, 0))
+        inverted_list[token].append(posting(docid_n, freq))
 
-    if dump_counter== 500:
-        dbfile = open(str(docid_n), 'ab')
-        pickle.dump(inverted_list, dbfile)
-        dump_counter=0
-        inverted_list.clear()
-        dbfile.close()
+
+    dbfile = open('index', 'ab')
+    pickle.dump(inverted_list, dbfile)
+    dump_counter=0
+    inverted_list.clear()
+    dbfile.close()
     f.close()
+    print(docid_n,inverted_list)
 
 
 # def parse_json(data):
@@ -90,20 +92,33 @@ if __name__ == '__main__':
 
     print("Enter directory:")
     directory = input()
-    for folder in os.listdir(directory):    # Runs through each folder
-        abs_file_path = directory + "/" + folder    # Path to each folder within DEV folder
-        print(abs_file_path)
-        for file in os.listdir(abs_file_path):  # Runs through each file in a folder
-            print(file)
-            final_path = abs_file_path + "/" + file     # Path to json files in folders
-            print(final_path)
+    for root, dirs, files in os.walk(directory,topdown=True):
+        print(root)
+        # print(dirs)
+        # print(files)
+        for file in files:
             if file.endswith('.json'):
+                build_index(os.path.join(root,file))
 
-                build_index(final_path)
+            else:
+                print(file)
+        # for file in files:
+        #     with open(os.path.join(root, file), "r") as auto:
+
+    # for folder in os.listdir(directory):    # Runs through each folder
+    #     abs_file_path = directory + "/" + folder    # Path to each folder within DEV folder
+    #     print(abs_file_path)
+    #     for file in os.listdir(abs_file_path):  # Runs through each file in a folder
+    #         print(file)
+    #         final_path = abs_file_path + "/" + file     # Path to json files in folders
+    #         print(final_path)
+    #         if file.endswith('.json'):
+    #
+    #             build_index(final_path)
                 # print50(bigBook)
 
     if len(inverted_list)!=0:
-        dbfile = open(str(docid_n), 'ab')
+        dbfile = open('index', 'ab')
         pickle.dump(inverted_list, dbfile)
         inverted_list.clear()
         dbfile.close()
@@ -111,21 +126,21 @@ if __name__ == '__main__':
     # print(inverted_list)
 
 
-    # print the keys, then the values (a list)
-    for x in inverted_list:
-        i = 0  # for checking if a comma needs to be printed
-        print(x, ": [", end="")
-        fileOUT.write("{} [".format(x))
-
-        listOfPosting = inverted_list[x]
-        for z in listOfPosting:  # print the value(the list of posting)
-            if i > 0:
-                print(",", end=" ")
-                fileOUT.write(",")
-            print("(", z.docid, ",", z.tfidf, ")", end="")
-            fileOUT.write("({},{})".format(str(z.docid), str(z.tfidf)))
-            i += 1  # this is only for checking if a comma should be added, nothing else
-
-        print("]")
-        fileOUT.write("]\n")
-    fileOUT.close()
+    # # print the keys, then the values (a list)
+    # for x in inverted_list:
+    #     i = 0  # for checking if a comma needs to be printed
+    #     print(x, ": [", end="")
+    #     fileOUT.write("{} [".format(x))
+    #
+    #     listOfPosting = inverted_list[x]
+    #     for z in listOfPosting:  # print the value(the list of posting)
+    #         if i > 0:
+    #             print(",", end=" ")
+    #             fileOUT.write(",")
+    #         print("(", z.docid, ",", z.tfidf, ")", end="")
+    #         fileOUT.write("({},{})".format(str(z.docid), str(z.tfidf)))
+    #         i += 1  # this is only for checking if a comma should be added, nothing else
+    #
+    #     print("]")
+    #     fileOUT.write("]\n")
+    # fileOUT.close()
