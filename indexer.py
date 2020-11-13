@@ -5,12 +5,13 @@ import json
 from PartA import *
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
-# import pickle
+import pickle
 
 inverted_list = dict()  # key= token, values = list(Posting)
 docid_n = 0
-
+dump_counter=0
 bigBook = {}
+token_num= set()
 
 
 class Posting(object):
@@ -38,12 +39,16 @@ def build_index(document):
     """
 
     global bigBook
-
+    global dump_counter
+    global docid_n
+    docid_n += 1
+    dump_counter += 1
     with open(document)as f:
         data = json.load(f)
-        print(data["content"])
+        # print(data["content"])
 
     soup = BeautifulSoup(data["content"], 'html.parser')
+
 
     s = soup.get_text()
 
@@ -52,11 +57,18 @@ def build_index(document):
     b_sorted = sorted(bigBook.items(), reverse=True,
                       key=operator.itemgetter(1))
     for token, freq in b_sorted:
+        token_num.add(token)
         if token not in inverted_list.keys():
-            print(token, freq)
+            # print(token, freq)
             inverted_list[token] = list()
         inverted_list[token].append(Posting(docid_n, freq, 0, 0))
 
+    if dump_counter== 500:
+        dbfile = open(str(docid_n), 'ab')
+        pickle.dump(inverted_list, dbfile)
+        dump_counter=0
+        inverted_list.clear()
+        dbfile.close()
     f.close()
 
 
@@ -82,14 +94,22 @@ if __name__ == '__main__':
         abs_file_path = directory + "/" + folder    # Path to each folder within DEV folder
         print(abs_file_path)
         for file in os.listdir(abs_file_path):  # Runs through each file in a folder
+            print(file)
             final_path = abs_file_path + "/" + file     # Path to json files in folders
             print(final_path)
             if file.endswith('.json'):
-                docid_n += 1
-                build_index(final_path)
-                print50(bigBook)
 
+                build_index(final_path)
+                # print50(bigBook)
+
+    if len(inverted_list)!=0:
+        dbfile = open(str(docid_n), 'ab')
+        pickle.dump(inverted_list, dbfile)
+        inverted_list.clear()
+        dbfile.close()
+    print(len(token_num))
     # print(inverted_list)
+
 
     # print the keys, then the values (a list)
     for x in inverted_list:
