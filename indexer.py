@@ -64,7 +64,7 @@ def build_index(document):
             inverted_list[token] = list()
         inverted_list[token].append(posting(docid_n, freq))
 
-
+    bigBook.clear()
     # dbfile = open('index', 'ab')
     # pickle.dump(inverted_list, dbfile)
     # dump_counter=0
@@ -73,7 +73,7 @@ def build_index(document):
     # f.close()
 
     fileOUT = open("index.txt", "a")
-    if dump_counter==3000:
+    if dump_counter==12000:
         print("dump")
         for x in inverted_list:
             i = 0  # for checking if a comma needs to be printed
@@ -90,21 +90,12 @@ def build_index(document):
                 i += 1  # this is only for checking if a comma should be added, nothing else
 
             # print("]")
-            fileOUT.write("]\n")
+            fileOUT.write("]")
         dump_counter=0
         inverted_list.clear()
         fileOUT.close()
-        f.close()
-        dump_counter=0
+    f.close()
     print(docid_n,document,len(token_num))
-
-
-# def parse_json(data):
-#     """
-#     Parse json file into contents that can read by simple_tokenize
-#     :param data: json file stored as dict
-#     :return: list of words
-
 
 if __name__ == '__main__':
     """
@@ -113,34 +104,19 @@ if __name__ == '__main__':
     if os.path.exists("output.txt"):    # Resets the output file
         os.remove("output.txt")
 
-    fileOUT = open("output.txt", "a")
 
     print("Enter directory:")
     directory = input()
     for root, dirs, files in os.walk(directory,topdown=True):
         print(root)
-        # print(dirs)
-        # print(files)
+
         for file in files:
             if file.endswith('.json'):
                 build_index(os.path.join(root,file))
 
             else:
                 print(file)
-        # for file in files:
-        #     with open(os.path.join(root, file), "r") as auto:
 
-    # for folder in os.listdir(directory):    # Runs through each folder
-    #     abs_file_path = directory + "/" + folder    # Path to each folder within DEV folder
-    #     print(abs_file_path)
-    #     for file in os.listdir(abs_file_path):  # Runs through each file in a folder
-    #         print(file)
-    #         final_path = abs_file_path + "/" + file     # Path to json files in folders
-    #         print(final_path)
-    #         if file.endswith('.json'):
-    #
-    #             build_index(final_path)
-                # print50(bigBook)
 
     if len(inverted_list)!=0:
         dbfile = open('index', 'ab')
@@ -148,24 +124,3 @@ if __name__ == '__main__':
         inverted_list.clear()
         dbfile.close()
     print(len(token_num))
-    # print(inverted_list)
-
-
-    # # print the keys, then the values (a list)
-    # for x in inverted_list:
-    #     i = 0  # for checking if a comma needs to be printed
-    #     print(x, ": [", end="")
-    #     fileOUT.write("{} [".format(x))
-    #
-    #     listOfPosting = inverted_list[x]
-    #     for z in listOfPosting:  # print the value(the list of posting)
-    #         if i > 0:
-    #             print(",", end=" ")
-    #             fileOUT.write(",")
-    #         print("(", z.docid, ",", z.tfidf, ")", end="")
-    #         fileOUT.write("({},{})".format(str(z.docid), str(z.tfidf)))
-    #         i += 1  # this is only for checking if a comma should be added, nothing else
-    #
-    #     print("]")
-    #     fileOUT.write("]\n")
-    # fileOUT.close()
