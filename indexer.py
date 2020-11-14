@@ -65,13 +65,38 @@ def build_index(document):
         inverted_list[token].append(posting(docid_n, freq))
 
 
-    dbfile = open('index', 'ab')
-    pickle.dump(inverted_list, dbfile)
-    dump_counter=0
-    inverted_list.clear()
-    dbfile.close()
-    f.close()
-    print(docid_n,inverted_list)
+    # dbfile = open('index', 'ab')
+    # pickle.dump(inverted_list, dbfile)
+    # dump_counter=0
+    # inverted_list.clear()
+    # dbfile.close()
+    # f.close()
+
+    fileOUT = open("index.txt", "a")
+    if dump_counter==3000:
+        print("dump")
+        for x in inverted_list:
+            i = 0  # for checking if a comma needs to be printed
+            # print(x, ": [", end="")
+            fileOUT.write("{} [".format(x))
+
+            listOfPosting = inverted_list[x]
+            for z in listOfPosting:  # print the value(the list of posting)
+                if i > 0:
+                    # print(",", end=" ")
+                    fileOUT.write(",")
+                # print("(", z[0], ",", z[1], ")", end="")
+                fileOUT.write("({},{})".format(str(z[0]), str(z[1])))
+                i += 1  # this is only for checking if a comma should be added, nothing else
+
+            # print("]")
+            fileOUT.write("]\n")
+        dump_counter=0
+        inverted_list.clear()
+        fileOUT.close()
+        f.close()
+        dump_counter=0
+    print(docid_n,document,len(token_num))
 
 
 # def parse_json(data):
