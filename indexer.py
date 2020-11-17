@@ -9,9 +9,9 @@ import pickle
 
 inverted_list = dict()  # key= token, values = list(Posting)
 docid_n = 0
-dump_counter=0
+dump_counter = 0
 bigBook = {}
-token_num= set()
+token_num = set()
 
 
 # class Posting(object):
@@ -32,6 +32,8 @@ token_num= set()
 
 def posting(docid, tfidf):
     return [docid, tfidf]
+
+
 def build_index(document):
     """
     Storing inverted_list as indexer.
@@ -49,7 +51,6 @@ def build_index(document):
         # print(data["content"])
 
     soup = BeautifulSoup(data["content"], 'html.parser')
-
 
     s = soup.get_text()
 
@@ -73,7 +74,7 @@ def build_index(document):
     # f.close()
 
     fileOUT = open("index.txt", "a")
-    if dump_counter==12000:
+    if dump_counter == 12000:
         print("dump")
         for x in inverted_list:
             i = 0  # for checking if a comma needs to be printed
@@ -91,34 +92,33 @@ def build_index(document):
 
             # print("]")
             fileOUT.write("]")
-        dump_counter=0
+        dump_counter = 0
         inverted_list.clear()
         fileOUT.close()
     f.close()
-    print(docid_n,document,len(token_num))
+    print(docid_n, document, len(token_num))
+
 
 if __name__ == '__main__':
     """
     For M1 testing purpose
     """
-    if os.path.exists("output.txt"):    # Resets the output file
+    if os.path.exists("output.txt"):  # Resets the output file
         os.remove("output.txt")
-
 
     print("Enter directory:")
     directory = input()
-    for root, dirs, files in os.walk(directory,topdown=True):
+    for root, dirs, files in os.walk(directory, topdown=True):
         print(root)
 
         for file in files:
             if file.endswith('.json'):
-                build_index(os.path.join(root,file))
+                build_index(os.path.join(root, file))
 
             else:
                 print(file)
 
-
-    if len(inverted_list)!=0:
+    if len(inverted_list) != 0:
         dbfile = open('index', 'ab')
         pickle.dump(inverted_list, dbfile)
         inverted_list.clear()
