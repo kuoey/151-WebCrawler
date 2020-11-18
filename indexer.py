@@ -73,28 +73,50 @@ def build_index(document):
     # dbfile.close()
     # f.close()
 
-    fileOUT = open("index.txt", "a")
+    # pickle stuffs
+    # Its important to use binary mode
+    # dbfile = open("index", 'ab')
+    #
+    # # source, destination
+    # pickle.dump(inverted_list, dbfile)
+    # dbfile.close()
+    # dbfile now contains the pickled version of inverted list
+
+    # loading data from pickle / reading pickle
+    openDBfile = open("index", 'rb')
+    db = pickle.load(openDBfile)
+    # db holds the inverted list that was put into dbfile
+    for keys in db:
+        print(keys, '=>', db[keys])
+
+    openDBfile.close()
+
+    # fileOUT = open("index.txt", "a")
     if dump_counter == 12000:
         print("dump")
-        for x in inverted_list:
-            i = 0  # for checking if a comma needs to be printed
-            # print(x, ": [", end="")
-            fileOUT.write("{} [".format(x))
-
-            listOfPosting = inverted_list[x]
-            for z in listOfPosting:  # print the value(the list of posting)
-                if i > 0:
-                    # print(",", end=" ")
-                    fileOUT.write(",")
-                # print("(", z[0], ",", z[1], ")", end="")
-                fileOUT.write("({},{})".format(str(z[0]), str(z[1])))
-                i += 1  # this is only for checking if a comma should be added, nothing else
-
-            # print("]")
-            fileOUT.write("]")
-        dump_counter = 0
-        inverted_list.clear()
-        fileOUT.close()
+        # writing pickle
+        dbfile = open("index", 'ab')
+        pickle.dump(inverted_list, dbfile)
+        dbfile.close()
+        # for x in inverted_list:
+        #     i = 0  # for checking if a comma needs to be printed
+        #     # print(x, ": [", end="")
+        #     fileOUT.write("{} [".format(x))
+        #
+        #     listOfPosting = inverted_list[x]
+        #     for z in listOfPosting:  # print the value(the list of posting)
+        #         if i > 0:
+        #             # print(",", end=" ")
+        #             fileOUT.write(",")
+        #         # print("(", z[0], ",", z[1], ")", end="")
+        #         fileOUT.write("({},{})".format(str(z[0]), str(z[1])))
+        #         i += 1  # this is only for checking if a comma should be added, nothing else
+        #
+        #     # print("]")
+        #     fileOUT.write("]")
+        # dump_counter = 0
+        # inverted_list.clear()
+        # fileOUT.close()
     f.close()
     print(docid_n, document, len(token_num))
 
