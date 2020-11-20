@@ -13,6 +13,7 @@ dump_counter = 0
 bigBook = {}
 token_num = set()
 urls={}
+total_words={}
 
 # class Posting(object):
 #
@@ -50,6 +51,7 @@ def build_index(document):
         data = json.load(f)
         # print(data["content"])
         urls[docid_n]=data["url"]
+        total_words[docid_n]=len(data["content"])
 
     soup = BeautifulSoup(data["content"], 'html.parser')
 
@@ -67,6 +69,8 @@ def build_index(document):
         inverted_list[token].append(posting(docid_n, freq))
 
     bigBook.clear()
+    inverted_list.clear()
+
     # dbfile = open('index', 'ab')
     # pickle.dump(inverted_list, dbfile)
     # dump_counter=0
@@ -96,6 +100,9 @@ def build_index(document):
         urlfile = open("urls", 'ab')
         pickle.dump(urls, urlfile)
         urlfile.close()
+        wordsfile = open("words", 'ab')
+        pickle.dump(total_words, wordsfile)
+        wordsfile.close()
     f.close()
     print(docid_n, document, len(token_num))
 
