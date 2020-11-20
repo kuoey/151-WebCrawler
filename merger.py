@@ -8,9 +8,12 @@ def get_results(word):
     results = []
     while 1:    # Horrible condition, never do this ever ever ever
         try:
+            #[[123]],[[456]]
             dict = pickle.load(dbfile)
-            for entry in dict[word]:
-                results.append(entry)
+            if word in dict.keys():
+                for entry in dict[word]:
+                    results.append(entry)
+
         except(EOFError):
             break
     dbfile.close()
@@ -61,6 +64,7 @@ if __name__ == '__main__':
     print(test_dict)
 
     test_dict = pickle.load(dbfile)
+
     print(test_dict)
 
     print(get_results("2"))
