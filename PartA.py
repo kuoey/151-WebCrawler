@@ -5,6 +5,8 @@ import sys  # Gets commands line args
 import os  # Testing file paths
 import operator  # Used for sorting dictionaries
 
+from nltk.stem import PorterStemmer
+
 commonList = ["a", "about", "above", "after", "again", "against",
               "all", "am", "an", "and", "any", "are",
               "arent", "as", "at", "be", "because", "been",
@@ -43,6 +45,7 @@ repeating.
 
 def tokenize(filepath):
     tokens = []
+    ps = PorterStemmer()
     if os.path.exists(filepath):  # https://stackoverflow.com/questions/82831/how-do-i-check-whether-a-file-exists-without-exceptions
         with open(filepath, 'r', encoding="utf-8") as f:
             try:  # Catches files that can't be read
@@ -51,6 +54,7 @@ def tokenize(filepath):
                         try:  # Catches words that can't be tokenized
                             res = re.sub(r'[^A-Za-z0-9]', '', word)  # Use regex to remove non alpha numerics
                             res = res.lower()
+                            res = ps.stem(res)
                             if res != '' and res not in commonList:  # Does not allow blank tokens
                                 tokens.append(res)
                         except:  # Skips bad words
@@ -101,9 +105,11 @@ def aPrint(freqMap):
 # Takes a list strings and turns them into proper tokens
 def simple_tokenize(tokens):
     counter = 0
+    ps = PorterStemmer()
     while counter < len(tokens):
         res = re.sub(r'[^A-Za-z0-9]', '', tokens[counter])  # Use regex to remove non alpha numerics
         res = res.lower()
+        res = ps.stem(res)
         #print("res: {}".format(res))
         if res == '' or res in commonList:  # Does not allow blank tokens or common words
             tokens.pop(counter)
