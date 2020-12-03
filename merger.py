@@ -120,7 +120,8 @@ def txt_merge():
     subIndex.clear()
 
 
-def search():
+def search(word):
+    r=[]
     fileREAD = open("SuperIndex.txt", "r")
     pFile = open('subIndex', 'rb')
     subIndex = pickle.load(pFile)
