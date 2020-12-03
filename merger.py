@@ -126,15 +126,31 @@ def search(word):
     pFile = open('subIndex', 'rb')
     subIndex = pickle.load(pFile)
     pFile.close()
-    # word = input("Enter your search: ")
+
+    myList = []
+    word = input("Enter your search: ")
     if subIndex.get(word) is not None:
         for pair in subIndex[word]:
             fileREAD.seek(pair[0])
-            r.append(fileREAD.read(pair[1]))
-            print(r)
-    else:
-        print("empty")
+            strToList(myList, fileREAD.read(pair[1]))
+
     fileREAD.close()
+    return myList
+
+
+def strToList(pList, pString):
+    n1 = -1
+    n2 = -1
+    postings = pString.split()
+    for num in postings:
+        num = re.sub(r'[^0-9]', '', num)
+        if n1 == -1:
+            n1 = int(num)
+        else:
+            n2 = int(num)
+            pList.append((n1, n2))
+            n1 = -1
+            n2 = -1
 
 
 if __name__ == '__main__':
@@ -142,8 +158,10 @@ if __name__ == '__main__':
     if not os.path.exists("index"):    # Checks for index file
         print("Error, couldn't find file: index")
         exit(0)
-    # txt_merge()
-    search("cristina")
+
+
+    myList = search()
+    print(myList)
 
     # txt_merge()
 
