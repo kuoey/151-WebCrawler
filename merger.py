@@ -120,16 +120,20 @@ def txt_merge():
     subIndex.clear()
 
 
-def search():
+def search(word):
+    r=[]
     fileREAD = open("SuperIndex.txt", "r")
     pFile = open('subIndex', 'rb')
     subIndex = pickle.load(pFile)
     pFile.close()
-    word = input("Enter your search: ")
+    # word = input("Enter your search: ")
     if subIndex.get(word) is not None:
         for pair in subIndex[word]:
             fileREAD.seek(pair[0])
-            print(fileREAD.read(pair[1]))
+            r.append(fileREAD.read(pair[1]))
+            print(r)
+    else:
+        print("empty")
     fileREAD.close()
 
 
@@ -138,8 +142,8 @@ if __name__ == '__main__':
     if not os.path.exists("index"):    # Checks for index file
         print("Error, couldn't find file: index")
         exit(0)
-
-    search()
+    # txt_merge()
+    search("cristina")
 
     # txt_merge()
 
