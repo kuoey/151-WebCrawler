@@ -139,16 +139,21 @@ def search(word):
 def strToList(pList, pString):
     n1 = -1
     n2 = -1
+    n3 = -1
     postings = pString.split()
     for num in postings:
         num = re.sub(r'[^0-9]', '', num)
         if n1 == -1:
             n1 = int(num)
-        else:
+        elif n2 == -1:
             n2 = int(num)
-            pList.append((n1, n2))
+        elif n3 == -1:
+            n3 = int(num)
+        else:
+            pList.append([n1, n2, n3, int(num)])
             n1 = -1
             n2 = -1
+            n3 = -1
 
 
 if __name__ == '__main__':
@@ -157,7 +162,9 @@ if __name__ == '__main__':
         print("Error, couldn't find file: index")
         exit(0)
 
-    myList = search()
+    #txt_merge()
+
+    myList = search("uci")
     print(myList)
 
     # txt_merge()
