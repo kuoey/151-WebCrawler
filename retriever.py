@@ -97,11 +97,11 @@ import merger
 def retrever_test():
     global check_docid
     docids=set()
-    check_docid=[]
+    # check_docid=[]
     ranking=dict()
-    result=dict()
+    # result=dict()
     N = 55393
-    idf = []
+    # idf = []
     fileREAD = open("SuperIndex.txt", "r")
     pFile = open('subIndex', 'rb')
     subIndex = pickle.load(pFile)
@@ -110,42 +110,40 @@ def retrever_test():
     start_time = datetime.datetime.now()
     queries = simple_tokenize(list(set(query.split())))
 
-
     for q in queries:
         postings = simple_search(q, fileREAD, subIndex)
         if len(postings)>0:
-            idf.append(math.log(N / len(postings)))
+            # idf.append(math.log(N / len(postings)))
             if len(docids)==0:
-                docids=  set(i[0] for i in postings)
+                docids= set(i[0] for i in postings)
             else:
                 docids &= set(i[0] for i in postings)
             # print("Posting",postings)
             for i in postings:
                 if i[0] in docids:
                     if i[0] in ranking.keys():
-                        if i not in check_docid:
+                        # if i[0] not in check_docid:
                             # print(ranking[i[0]],((1 + math.log(i[1])),i[2]))
-                            ranking[i[0]].append(float(i[1])+i[2]*5)
-                        else:
-                            ranking[i[0]][len(ranking[i[0]])-1]=ranking[i[0]][len(ranking[i[0]])-1]+(float(i[1])+i[2]*5)
+                        ranking[i[0]]+=(float(i[1])+i[2]*5*(math.log(N / len(postings))))
                     else:
-                        ranking[i[0]]=[float(i[1])+i[2]*5]
-                    check_docid.append(i[0])
-                else:
-                    if i[0] in ranking.keys():
-                        ranking.pop(i[0])
+                        ranking[i[0]]=float(i[1])+i[2]*5*(math.log(N / len(postings)))
+                    # check_docid.append(i[0])
         else:
             print("Nothing found")
     # print(ranking.keys())
-    for i in range(len(idf)):
-        for j in ranking.keys():
-            if j in docids:
-                # print(ranking[j][i][0])
-                result[j]=(1+math.log(ranking[j][i]))* idf[i]
+    # for i in range(len(idf)):
+    #     for j in docids:
+    #         # if j in docids:
+    #             # print(ranking[j][i][0])
+    #         if i ==0:
+    #             result[j]=(1+math.log(ranking[j][i]))* idf[i]
+    #         else:
+    #             result[j] += (1 + math.log(ranking[j][i])) * idf[i]
     counter=0
     # print(result)
     # print(idf, ranking,result)
-    for k, v in sorted(result.items(), key=lambda item: item[1],reverse=True):
+    # for k, v in sorted(result.items(), key=lambda item: item[1],reverse=True):
+    for k, v in sorted(ranking.items(), key=lambda item: item[1],reverse=True):
         # print(k)
         print(get_urls(k))
         counter+=1
@@ -168,6 +166,7 @@ def get_urls(word):
             dict = pickle.load(dbfile)
             if word in dict.keys():
                 results=dict[word]
+                break
         except(EOFError):
             break
     dbfile.close()
