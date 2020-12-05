@@ -1,3 +1,4 @@
+import datetime
 import os
 import pickle
 from PartA import *
@@ -121,19 +122,32 @@ def txt_merge():
 
 
 def search(word):
-    r=[]
     fileREAD = open("SuperIndex.txt", "r")
     pFile = open('subIndex', 'rb')
     subIndex = pickle.load(pFile)
     pFile.close()
     myList = []
-    word = input("Enter your search: ")
+    # word = input("Enter your search: ")
     if subIndex.get(word) is not None:
         for pair in subIndex[word]:
             fileREAD.seek(pair[0])
             strToList(myList, fileREAD.read(pair[1]))
     fileREAD.close()
     return myList
+
+
+def simple_search(word, fileREAD, subIndex):    # Word being searched, open file pointer to superindex, and a subindex that is equal to the first load of pickle file
+    aList = []
+    # start_time = datetime.datetime.now()
+    if subIndex.get(word) is not None:
+        for pair in subIndex[word]:
+            fileREAD.seek(pair[0])
+            strToList(aList, fileREAD.read(pair[1]))
+    # end_time = datetime.datetime.now()
+    # time_diff = end_time - start_time
+    # execution_time = time_diff.total_seconds() * 1000
+    # print(execution_time)
+    return aList
 
 
 def strToList(pList, pString):

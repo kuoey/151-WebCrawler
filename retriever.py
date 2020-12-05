@@ -36,18 +36,23 @@ import merger
 #         if(counter==5):
 #             break
 
-def retrever_test(query):
+def retrever_test():
     global check_docid
-    query = str(query)
-    queries = simple_tokenize(query.split())
     docids=set()
     check_docid=[]
     ranking=dict()
     result=dict()
     N = 55393
     idf = []
+    fileREAD = open("SuperIndex.txt", "r")
+    pFile = open('subIndex', 'rb')
+    subIndex = pickle.load(pFile)
+    pFile.close()
+    query = str(input("Enter your search: "))
+    start_time = datetime.datetime.now()
+    queries = simple_tokenize(query.split())
     for q in queries:
-        postings = search(q)
+        postings = simple_search(q, fileREAD, subIndex)
         idf.append(math.log(N / len(postings)))
 
         if len(docids)==0:
@@ -73,7 +78,9 @@ def retrever_test(query):
     # print(ranking.keys())
     for i in range(len(idf)):
         for j in ranking.keys():
-            result[j]=(ranking[j][i][0]/idf[i])+ranking[j][i][0]
+            if j in docids:
+                print(ranking[j][i][0])
+                result[j]=(ranking[j][i][0]/idf[i])+ranking[j][i][0]
     counter=0
     # print(result)
     # print(idf, ranking,result)
@@ -83,6 +90,13 @@ def retrever_test(query):
         counter+=1
         if(counter==5):
             break
+    end_time = datetime.datetime.now()
+    time_diff = end_time - start_time
+    execution_time = time_diff.total_seconds() * 1000
+    print(execution_time)
+    fileREAD.close()
+
+
 def get_urls(word):
     dbfile = open('urls', 'rb')
     results = ""
@@ -112,6 +126,11 @@ def get_wordcount(word):
     dbfile.close()
     return results
 if __name__ == '__main__':
-    print("Please enter the term:")
-    term = input().lower()
-    retrever_test(term)
+    # print("Please enter the term:")
+    # term = input().lower()
+    # start_time = datetime.datetime.now()
+    retrever_test()
+    # end_time = datetime.datetime.now()
+    # time_diff = end_time - start_time
+    # execution_time = time_diff.total_seconds() * 1000
+    # print(execution_time)
