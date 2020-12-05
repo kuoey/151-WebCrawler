@@ -45,8 +45,65 @@ import merger
 #         if(counter==5):
 #             break
 
-def retriever_test(query, fileREAD, subIndex):
-    start_time = datetime.datetime.now()
+# def retrever_test():
+#     global check_docid
+#     docids=set()
+#     check_docid=[]
+#     ranking=dict()
+#     result=dict()
+#     N = 55393
+#     idf = []
+#     fileREAD = open("SuperIndex.txt", "r")
+#     pFile = open('subIndex', 'rb')
+#     subIndex = pickle.load(pFile)
+#     pFile.close()
+#     query = str(input("Enter your search: "))
+#     start_time = datetime.datetime.now()
+#     queries = simple_tokenize(query.split())
+#     for q in queries:
+#         postings = simple_search(q, fileREAD, subIndex)
+#         idf.append(math.log(N / len(postings)))
+#         if len(docids)==0:
+#             docids=  set(i[0] for i in postings)
+#         else:
+#             docids &= set(i[0] for i in postings)
+#         # print("Posting",postings)
+#         for i in postings:
+#             if i[0] in docids:
+#                 if i[0] in ranking.keys():
+#                     if i not in check_docid:
+#                         # print(ranking[i[0]],((1 + math.log(i[1])),i[2]))
+#                         ranking[i[0]].append(tuple(map(operator.add, ranking[i[0]][len(ranking[i[0]])-1],((1 + math.log(i[1])),i[2]))))
+#                     else:
+#                         ranking[i[0]][len(ranking[i[0]])-1]=tuple(map(operator.add, ranking[i[0]][len(ranking[i[0]])-1],((1 + math.log(i[1])),i[2])))
+#                 else:
+#                     ranking[i[0]]=[(float(i[1]),i[2])]
+#                 check_docid.append(i[0])
+#             else:
+#                 if i[0] in ranking.keys():
+#                     ranking.pop(i[0])
+#     # print(ranking.keys())
+#     for i in range(len(idf)):
+#         for j in ranking.keys():
+#             if j in docids:
+#                 # print(ranking[j][i][0])
+#                 result[j]=(ranking[j][i][0]/idf[i])+ranking[j][i][0]
+#     counter=0
+#     # print(result)
+#     # print(idf, ranking,result)
+#     for k, v in sorted(result.items(), key=lambda item: item[1],reverse=True):
+#         # print(k)
+#         print(get_urls(k))
+#         counter+=1
+#         if(counter==5):
+#             break
+#     end_time = datetime.datetime.now()
+#     time_diff = end_time - start_time
+#     execution_time = time_diff.total_seconds() * 1000
+#     print(execution_time)
+#     fileREAD.close()
+
+def retrever_test():
     global check_docid
     global urlArray
     docids = set()
@@ -55,41 +112,47 @@ def retriever_test(query, fileREAD, subIndex):
     result = dict()
     N = 55393
     idf = []
-    # query = str(input("Enter your search: "))
-    queries = simple_tokenize(query.split())
+    fileREAD = open("SuperIndex.txt", "r")
+    pFile = open('subIndex', 'rb')
+    subIndex = pickle.load(pFile)
+    pFile.close()
+    query = str(input("Enter your search: "))
+    start_time = datetime.datetime.now()
+    queries = simple_tokenize(list(set(query.split())))
+
+
     for q in queries:
         postings = simple_search(q, fileREAD, subIndex)
-        idf.append(math.log(N / len(postings)))
-
-        if len(docids) == 0:
-            docids = set(i[0] for i in postings)
-        else:
-            docids &= set(i[0] for i in postings)
-        # print("Posting",postings)
-        for i in postings:
-            if i[0] in docids:
-
-                if i[0] in ranking.keys():
-                    if i not in check_docid:
-                        # print(ranking[i[0]],((1 + math.log(i[1])),i[2]))
-                        ranking[i[0]].append(tuple(
-                            map(operator.add, ranking[i[0]][len(ranking[i[0]]) - 1], ((1 + math.log(i[1])), i[2]))))
-                    else:
-                        ranking[i[0]][len(ranking[i[0]]) - 1] = tuple(
-                            map(operator.add, ranking[i[0]][len(ranking[i[0]]) - 1], ((1 + math.log(i[1])), i[2])))
-                else:
-                    ranking[i[0]] = [(float(i[1]), i[2])]
-                check_docid.append(i[0])
+        if len(postings)>0:
+            idf.append(math.log(N / len(postings)))
+            if len(docids)==0:
+                docids=  set(i[0] for i in postings)
             else:
-                if i[0] in ranking.keys():
-                    ranking.pop(i[0])
+                docids &= set(i[0] for i in postings)
+            # print("Posting",postings)
+            for i in postings:
+                if i[0] in docids:
+                    if i[0] in ranking.keys():
+                        if i not in check_docid:
+                            # print(ranking[i[0]],((1 + math.log(i[1])),i[2]))
+                            ranking[i[0]].append(float(i[1])+i[2]*5)
+                        else:
+                            ranking[i[0]][len(ranking[i[0]])-1]=ranking[i[0]][len(ranking[i[0]])-1]+(float(i[1])+i[2]*5)
+                    else:
+                        ranking[i[0]]=[float(i[1])+i[2]*5]
+                    check_docid.append(i[0])
+                else:
+                    if i[0] in ranking.keys():
+                        ranking.pop(i[0])
+        else:
+            print("Nothing found")
     # print(ranking.keys())
     for i in range(len(idf)):
         for j in ranking.keys():
             if j in docids:
                 # print(ranking[j][i][0])
-                result[j] = (ranking[j][i][0] / idf[i]) + ranking[j][i][0]
-    counter = 0
+                result[j]=(1+math.log(ranking[j][i]))* idf[i]
+    counter=0
     # print(result)
     # print(idf, ranking,result)
     urlArray.clear()
@@ -105,6 +168,7 @@ def retriever_test(query, fileREAD, subIndex):
     execution_time = time_diff.total_seconds() * 1000
     print(execution_time, "ms")
     # fileREAD.close()
+
 
 
 def get_urls(word):
