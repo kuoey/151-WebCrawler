@@ -9,10 +9,8 @@ def get_results(word):
     results = []
     while 1:    # Horrible condition, never do this ever ever ever
         try:
-            #[[123]],[[456]]
             dict = pickle.load(dbfile)
             if word in dict.keys():
-                #results = results + dict[word]
                 for entry in dict[word]:
                     results.append(entry)
 
@@ -65,8 +63,6 @@ def make_sub_index():
         except(EOFError):
             break
     oldfile.close()
-    # subIndex = sorted(subIndex.items(), key=operator.itemgetter(0))
-
     return subIndex
 
 
@@ -138,15 +134,10 @@ def search(word):
 
 def simple_search(word, fileREAD, subIndex):    # Word being searched, open file pointer to superindex, and a subindex that is equal to the first load of pickle file
     aList = []
-    # start_time = datetime.datetime.now()
     if subIndex.get(word) is not None:
         for pair in subIndex[word]:
             fileREAD.seek(pair[0])
             strToList(aList, fileREAD.read(pair[1]))
-    # end_time = datetime.datetime.now()
-    # time_diff = end_time - start_time
-    # execution_time = time_diff.total_seconds() * 1000
-    # print(execution_time)
     return aList
 
 
@@ -176,78 +167,6 @@ if __name__ == '__main__':
         print("Error, couldn't find file: index")
         exit(0)
 
-    #txt_merge()
-
     myList = search("uci")
     print(myList)
 
-    # txt_merge()
-
-    # pickle_merge()
-
-    """
-    dbfile = open('index', 'rb')
-
-    dict = pickle.load(dbfile)
-
-    print(dict["learn"])
-    dbfile.close()
-    """
-
-    """
-    if not os.path.exists("testIndex"):  # Checks for index file
-        book1 = {}
-        book2 = {}
-
-        list1 = ['@#%^$', 'Word', 'Words!', '沼', 'te沼st', '1991اف_جي2']
-        list2 = ['wOrD', 'JeReMy', '121*@#', 'pu#$ll', '#3PuSh', 'test', 'testing']
-
-        list1 = simple_tokenize(list1)
-        # The list is then fed to the dictionary bigBook using the combineFreq function
-        book1 = combineFreq(list1, book1)
-
-        # Same thing is done with second list
-        list2 = simple_tokenize(list2)
-        book2 = combineFreq(list2, book2)
-
-        dSorted1 = sorted(book1.items(), key=operator.itemgetter(0))
-        dSorted2 = sorted(book2.items(), key=operator.itemgetter(0))
-
-        dbfile = open('testIndex', 'ab')
-        pickle.dump(dSorted1, dbfile)
-        pickle.dump(dSorted2, dbfile)
-        dbfile.close()
-    """
-
-    #dbfile = open('index', 'rb')
-
-    #test_dict = pickle.load(dbfile)
-    #print(test_dict)
-
-    #test_dict = pickle.load(dbfile)
-
-    #print(test_dict)
-
-    # print(get_results("2"))
-
-    #dbfile.close()
-
-    # Test merging dictionaries together
-    """
-    mBook = {}
-    sBook = {}
-
-
-
-    mBook["mentor"] = [(1,8),(2,8),(3,8)]
-    sBook["mentor"] = [(293,2),(479,2),(559,2),(563,2),(1032,2),(1053,2)]
-    sBook["dab"] = [(69,420)]
-
-    for entry in sBook:
-        if entry in mBook:
-            mBook[entry] = mBook[entry] + sBook[entry]
-        else:
-            mBook[entry] = sBook[entry]
-
-    print(mBook)
-    """

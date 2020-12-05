@@ -110,7 +110,6 @@ def simple_tokenize(tokens):
         res = re.sub(r'[^A-Za-z0-9]', '', tokens[counter])  # Use regex to remove non alpha numerics
         res = res.lower()
         res = ps.stem(res)
-        #print("res: {}".format(res))
         if res == '' or res in commonList:  # Does not allow blank tokens or common words
             tokens.pop(counter)
         else:

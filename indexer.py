@@ -85,6 +85,7 @@ def build_index(document):
                 if type =='b' or type=='strong':
                     t=1
                 inverted_list[token].append(posting(docid_n, freq, t, 0))
+                # print(inverted_list[token])
 
             bigBook.clear()
 
