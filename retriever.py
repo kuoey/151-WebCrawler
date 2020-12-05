@@ -15,8 +15,9 @@ def retrieve(query):
     global check_docid
     query = str(query)
     queries=simple_tokenize(query.split())
+    rankingfile= open('ranked_index', 'rb')
     for q in queries:
-        dict = pickle.load(dbfile)
+        dict = pickle.load(rankingfile)
         if q ==queries[0]:
             if q in dict.keys():
                 #ranking for
@@ -27,7 +28,7 @@ def retrieve(query):
                 if i[0] in ranking.keys():
                     ranking[i[0]]+=i[3]
 
-
+    counter=0
     for k, v in sorted(ranking.items(), key=lambda item: item[1],reverse=True):
         print(get_urls(k))
         counter+=1
