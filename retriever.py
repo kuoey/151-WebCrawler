@@ -3,14 +3,20 @@ import os
 import requests
 import json
 from PartA import *
+from tkinter import *
+from tkinter import messagebox
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 import pickle
 import math
+import webbrowser
 from merger import *
 ranking=dict()
 check_docid=[]
 N=55393
+# added by eric
+urlArray = []
+labels = []  # creates an empty list for your labels
 import merger
 # def retrieve(query):
 #     global check_docid
@@ -36,20 +42,17 @@ import merger
 #         if(counter==5):
 #             break
 
-def retrever_test():
+def retrever_test(query, fileREAD, subIndex):
+    start_time = datetime.datetime.now()
     global check_docid
+    global urlArray
     docids=set()
     check_docid=[]
     ranking=dict()
     result=dict()
     N = 55393
     idf = []
-    fileREAD = open("SuperIndex.txt", "r")
-    pFile = open('subIndex', 'rb')
-    subIndex = pickle.load(pFile)
-    pFile.close()
-    query = str(input("Enter your search: "))
-    start_time = datetime.datetime.now()
+    # query = str(input("Enter your search: "))
     queries = simple_tokenize(query.split())
     for q in queries:
         postings = simple_search(q, fileREAD, subIndex)
@@ -79,14 +82,15 @@ def retrever_test():
     for i in range(len(idf)):
         for j in ranking.keys():
             if j in docids:
-                print(ranking[j][i][0])
+                # print(ranking[j][i][0])
                 result[j]=(ranking[j][i][0]/idf[i])+ranking[j][i][0]
     counter=0
     # print(result)
     # print(idf, ranking,result)
     for k, v in sorted(result.items(), key=lambda item: item[1],reverse=True):
         # print(k)
-        print(get_urls(k))
+        #print(get_urls(k))
+        urlArray.append(get_urls(k))
         counter+=1
         if(counter==5):
             break
@@ -94,7 +98,7 @@ def retrever_test():
     time_diff = end_time - start_time
     execution_time = time_diff.total_seconds() * 1000
     print(execution_time)
-    fileREAD.close()
+    #fileREAD.close()
 
 
 def get_urls(word):
@@ -125,12 +129,95 @@ def get_wordcount(word):
             break
     dbfile.close()
     return results
+
+
+# added by eric
+# creates application for GUI
+class Application(Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+
+        self.master = master
+        self.pack()
+        self.create_widgets()
+
+        pFile = open('subIndex', 'rb')
+        self.subIndex = pickle.load(pFile)
+        pFile.close()
+        self.file = open("SuperIndex.txt", "r")
+
+
+    def create_widgets(self):
+        self.fram = Frame(self.master)
+        Label(self.fram, text='Google2').pack(side=LEFT)
+        # adding of single line text box
+        self.edit = Entry(self.fram)
+
+        # positioning of entry text box
+        self.edit.pack(side=LEFT, fill=BOTH, expand=1)
+
+        # setting focus
+        self.edit.focus_set()
+
+        # adding of search button
+        self.butt = Button(self.fram, text='Search')
+        self.butt["command"] = self.find
+        # binds return key to the find function so the user can press search or return key
+        self.master.bind('<Return>', self.find)
+        self.butt.pack(side=RIGHT)
+
+        self.fram.pack(side=TOP)
+
+        # creates label "search results" and places it on left side
+        self.labelSearch = Label(root, text="Search Results:", anchor='w')  # set your text
+        self.labelSearch.pack(fill='both')
+
+    # it displays the search results
+    # the event =0 is needed for the return key, pls dont delete
+    def find(self, event=0):
+        # first destroy any hyperlinks if there are any (from previous search)
+        for label in labels:
+            label.destroy()
+        #labels.clear()
+
+        # returns to widget currently in focus
+        s = self.edit.get()
+        # s is the word that the user typed into the search box
+        if s:  # if the user has typed in a word in the search box:
+            term = s.lower()
+            retrever_test(term, self.file, self.subIndex)
+
+            # go through the array of top 5 urls and create labels that are hyperlinks
+            for i in urlArray:
+                print("temp ", i)
+
+                self.label = Label(root, text=i + '\n', fg="blue", cursor="hand2", anchor='w')  # set your text
+                self.label.pack(fill='both')
+                self.label.bind("<Button-1>", lambda event, url=i: webbrowser.open(url))
+                labels.append(self.label)  # appends the label to the list for further use
+
+        self.edit.focus_set()
+
+    def on_closing(self):
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.file.close()
+            root.destroy()
+# added by eric
+
+
 if __name__ == '__main__':
     # print("Please enter the term:")
     # term = input().lower()
     # start_time = datetime.datetime.now()
-    retrever_test()
+    # retrever_test()
     # end_time = datetime.datetime.now()
     # time_diff = end_time - start_time
     # execution_time = time_diff.total_seconds() * 1000
     # print(execution_time)
+
+    root = Tk()
+    root.geometry("1024x576")
+
+    app = Application(master=root)
+    app.master.protocol("WM_DELETE_WINDOW", app.on_closing)
+    app.mainloop()
