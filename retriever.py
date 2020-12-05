@@ -11,13 +11,16 @@ import pickle
 import math
 import webbrowser
 from merger import *
-ranking=dict()
-check_docid=[]
-N=55393
+
+ranking = dict()
+check_docid = []
+N = 55393
 # added by eric
 urlArray = []
 labels = []  # creates an empty list for your labels
 import merger
+
+
 # def retrieve(query):
 #     global check_docid
 #     query = str(query)
@@ -42,14 +45,14 @@ import merger
 #         if(counter==5):
 #             break
 
-def retrever_test(query, fileREAD, subIndex):
+def retriever_test(query, fileREAD, subIndex):
     start_time = datetime.datetime.now()
     global check_docid
     global urlArray
-    docids=set()
-    check_docid=[]
-    ranking=dict()
-    result=dict()
+    docids = set()
+    check_docid = []
+    ranking = dict()
+    result = dict()
     N = 55393
     idf = []
     # query = str(input("Enter your search: "))
@@ -58,8 +61,8 @@ def retrever_test(query, fileREAD, subIndex):
         postings = simple_search(q, fileREAD, subIndex)
         idf.append(math.log(N / len(postings)))
 
-        if len(docids)==0:
-            docids=  set(i[0] for i in postings)
+        if len(docids) == 0:
+            docids = set(i[0] for i in postings)
         else:
             docids &= set(i[0] for i in postings)
         # print("Posting",postings)
@@ -69,11 +72,13 @@ def retrever_test(query, fileREAD, subIndex):
                 if i[0] in ranking.keys():
                     if i not in check_docid:
                         # print(ranking[i[0]],((1 + math.log(i[1])),i[2]))
-                        ranking[i[0]].append(tuple(map(operator.add, ranking[i[0]][len(ranking[i[0]])-1],((1 + math.log(i[1])),i[2]))))
+                        ranking[i[0]].append(tuple(
+                            map(operator.add, ranking[i[0]][len(ranking[i[0]]) - 1], ((1 + math.log(i[1])), i[2]))))
                     else:
-                        ranking[i[0]][len(ranking[i[0]])-1]=tuple(map(operator.add, ranking[i[0]][len(ranking[i[0]])-1],((1 + math.log(i[1])),i[2])))
+                        ranking[i[0]][len(ranking[i[0]]) - 1] = tuple(
+                            map(operator.add, ranking[i[0]][len(ranking[i[0]]) - 1], ((1 + math.log(i[1])), i[2])))
                 else:
-                    ranking[i[0]]=[(float(i[1]),i[2])]
+                    ranking[i[0]] = [(float(i[1]), i[2])]
                 check_docid.append(i[0])
             else:
                 if i[0] in ranking.keys():
@@ -83,22 +88,23 @@ def retrever_test(query, fileREAD, subIndex):
         for j in ranking.keys():
             if j in docids:
                 # print(ranking[j][i][0])
-                result[j]=(ranking[j][i][0]/idf[i])+ranking[j][i][0]
-    counter=0
+                result[j] = (ranking[j][i][0] / idf[i]) + ranking[j][i][0]
+    counter = 0
     # print(result)
     # print(idf, ranking,result)
-    for k, v in sorted(result.items(), key=lambda item: item[1],reverse=True):
+    urlArray.clear()
+    for k, v in sorted(result.items(), key=lambda item: item[1], reverse=True):
         # print(k)
-        #print(get_urls(k))
+        # print(get_urls(k))
         urlArray.append(get_urls(k))
-        counter+=1
-        if(counter==5):
+        counter += 1
+        if counter == 5:
             break
     end_time = datetime.datetime.now()
     time_diff = end_time - start_time
     execution_time = time_diff.total_seconds() * 1000
-    print(execution_time)
-    #fileREAD.close()
+    print(execution_time, "ms")
+    # fileREAD.close()
 
 
 def get_urls(word):
@@ -146,7 +152,6 @@ class Application(Frame):
         pFile.close()
         self.file = open("SuperIndex.txt", "r")
 
-
     def create_widgets(self):
         self.fram = Frame(self.master)
         Label(self.fram, text='Google2').pack(side=LEFT)
@@ -176,25 +181,33 @@ class Application(Frame):
     # the event =0 is needed for the return key, pls dont delete
     def find(self, event=0):
         # first destroy any hyperlinks if there are any (from previous search)
-        for label in labels:
-            label.destroy()
-        #labels.clear()
+        labelsEmpty = len(labels) == 0
+        # for label in labels:
+        #     label.destroy()
+        # labels.clear()
 
         # returns to widget currently in focus
         s = self.edit.get()
         # s is the word that the user typed into the search box
         if s:  # if the user has typed in a word in the search box:
             term = s.lower()
-            retrever_test(term, self.file, self.subIndex)
+            retriever_test(term, self.file, self.subIndex)
 
             # go through the array of top 5 urls and create labels that are hyperlinks
+            labelIndex = 0
             for i in urlArray:
-                print("temp ", i)
+                if labelsEmpty:
+                    print("temp ", i)
 
-                self.label = Label(root, text=i + '\n', fg="blue", cursor="hand2", anchor='w')  # set your text
-                self.label.pack(fill='both')
-                self.label.bind("<Button-1>", lambda event, url=i: webbrowser.open(url))
-                labels.append(self.label)  # appends the label to the list for further use
+                    self.label = Label(root, text=i + '\n', fg="blue", cursor="hand2", anchor='w')  # set your text
+                    self.label.pack(fill='both')
+                    self.label.bind("<Button-1>", lambda event, url=i: webbrowser.open(url))
+                    labels.append(self.label)  # appends the label to the list for further use
+                else:
+                    print("temp ", i)
+                    labels[labelIndex].config(text=i + '\n')
+                    labels[labelIndex].bind("<Button-1>", lambda event, url=i: webbrowser.open(url))
+                    labelIndex += 1
 
         self.edit.focus_set()
 
@@ -202,6 +215,8 @@ class Application(Frame):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             self.file.close()
             root.destroy()
+
+
 # added by eric
 
 
