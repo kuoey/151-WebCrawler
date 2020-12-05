@@ -8,91 +8,94 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 import pickle
 import math
-import webbrowser
+from merger import *
+ranking=dict()
+check_docid=[]
+N=55393
 import merger
+# def retrieve(query):
+#     global check_docid
+#     query = str(query)
+#     queries=simple_tokenize(query.split())
+#     rankingfile= open('index', 'rb')
+#     for q in queries:
+#         dict = pickle.load(rankingfile)
+#         if q ==queries[0]:
+#             if q in dict.keys():
+#                 #ranking for
+#                 for i in dict[q]:
+#                     ranking[i[0]]=i[3]
+#         else:
+#             for i in dict[q]:
+#                 if i[0] in ranking.keys():
+#                     ranking[i[0]]+=i[3]
+#
+#     counter=0
+#     for k, v in sorted(ranking.items(), key=lambda item: item[1],reverse=True):
+#         print(get_urls(k))
+#         counter+=1
+#         if(counter==5):
+#             break
 
-ranking = dict()
-check_docid = []
-# added by eric
-urlArray = []
-labels = []  # creates an empty list for your labels
-
-
-# added by eric
-
-
-def retrieve(query):
+def retrever_test():
     global check_docid
-    global urlArray
-    query = str(query)
-
-    queries = simple_tokenize(query.split())
-    # print(queries)
-    # openDBfile = open("index", 'rb')
-    # db = pickle.load(openDBfile)
-    # openURLfile = open("urls", 'rb')
-    # url = pickle.load(openURLfile)
-    # openWfile = open("words", 'rb')
-    # total_words = pickle.load(openWfile)
-    # db holds the inverted list that was put into dbfile
+    docids=set()
+    check_docid=[]
+    ranking=dict()
+    result=dict()
     N = 55393
-
+    idf = []
+    fileREAD = open("SuperIndex.txt", "r")
+    pFile = open('subIndex', 'rb')
+    subIndex = pickle.load(pFile)
+    pFile.close()
+    query = str(input("Enter your search: "))
+    start_time = datetime.datetime.now()
+    queries = simple_tokenize(query.split())
     for q in queries:
-        inverted_list = merger.get_results(q)
-        # print("Inverted_list",inverted_list)
+        postings = simple_search(q, fileREAD, subIndex)
+        idf.append(math.log(N / len(postings)))
 
-        if inverted_list:
-            temp = list()
-            for status in inverted_list:
-                # print("Status",status)
-                q_docid = status[0]
-                q_freq = status[1]
-                # if q!=queries[0]:
-                #     if q_docid in check_docid:
-                #         temp.append(q_docid)
-                #         tf = q_freq / get_wordcount(q_docid)
-                #         idf = math.log(N / len(inverted_list))
-                #         tf_idf = tf * idf
-                #         # print("TF_IDF", tf_idf)
-                #         if q_docid not in ranking.keys():
-                #             ranking[q_docid] = tf_idf
-                #         else:
-                #             ranking[q_docid] += tf_idf
-                #     else:
-                #         pass
-                # else:
-                check_docid.append(q_docid)
-                tf = q_freq / get_wordcount(q_docid)
-                idf = math.log(N / len(inverted_list))
-                tf_idf = tf * idf
-                # print("TF_IDF",tf_idf)
-                if q_docid not in ranking.keys():
-                    ranking[q_docid] = tf_idf
+        if len(docids)==0:
+            docids=  set(i[0] for i in postings)
+        else:
+            docids &= set(i[0] for i in postings)
+        # print("Posting",postings)
+        for i in postings:
+            if i[0] in docids:
+
+                if i[0] in ranking.keys():
+                    if i not in check_docid:
+                        # print(ranking[i[0]],((1 + math.log(i[1])),i[2]))
+                        ranking[i[0]].append(tuple(map(operator.add, ranking[i[0]][len(ranking[i[0]])-1],((1 + math.log(i[1])),i[2]))))
+                    else:
+                        ranking[i[0]][len(ranking[i[0]])-1]=tuple(map(operator.add, ranking[i[0]][len(ranking[i[0]])-1],((1 + math.log(i[1])),i[2])))
                 else:
-                    ranking[q_docid] += tf_idf
-
-                # if len(temp)<len(check_docid):
-                #     check_docid=temp
-        # print("Check", check_docid)
-    counter = 0
-    rank = {}
-    # print(ranking)
-    for i in check_docid:
-        if i not in rank:
-            rank[i] = ranking[i]
-    ranking.clear()
-    # print("Rank:",rank)
-    urlArray = []
-    for k, v in sorted(rank.items(), key=lambda item: item[1], reverse=True):
-        # should add to array of strings, then have the GUI app read from that array
-        urlArray.append(get_urls(k))  # for now, append then print
-        # print(get_urls(k))
-        counter += 1
-        if counter == 5:
+                    ranking[i[0]]=[(float(i[1]),i[2])]
+                check_docid.append(i[0])
+            else:
+                if i[0] in ranking.keys():
+                    ranking.pop(i[0])
+    # print(ranking.keys())
+    for i in range(len(idf)):
+        for j in ranking.keys():
+            if j in docids:
+                print(ranking[j][i][0])
+                result[j]=(ranking[j][i][0]/idf[i])+ranking[j][i][0]
+    counter=0
+    # print(result)
+    # print(idf, ranking,result)
+    for k, v in sorted(result.items(), key=lambda item: item[1],reverse=True):
+        # print(k)
+        print(get_urls(k))
+        counter+=1
+        if(counter==5):
             break
-    # openURLfile.close()
-    # openDBfile.close()
-    # openWfile.close()
+    end_time = datetime.datetime.now()
+    time_diff = end_time - start_time
+    execution_time = time_diff.total_seconds() * 1000
+    print(execution_time)
+    fileREAD.close()
 
 
 def get_urls(word):
@@ -189,14 +192,11 @@ class Application(Frame):
 # added by eric
 
 if __name__ == '__main__':
-    # the GUI stuff will be started here
     # print("Please enter the term:")
     # term = input().lower()
-    # retrieve(term)
-
-    # added by eric
-    root = Tk()
-    root.geometry("1024x576")
-    app = Application(master=root)
-    app.mainloop()
-    # added by eric
+    # start_time = datetime.datetime.now()
+    retrever_test()
+    # end_time = datetime.datetime.now()
+    # time_diff = end_time - start_time
+    # execution_time = time_diff.total_seconds() * 1000
+    # print(execution_time)
