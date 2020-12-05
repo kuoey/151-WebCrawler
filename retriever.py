@@ -103,7 +103,7 @@ import merger
 #     print(execution_time)
 #     fileREAD.close()
 
-def retrever_test():
+def retrever_test(query, fileREAD, subIndex):
     global check_docid
     global urlArray
     docids = set()
@@ -112,21 +112,21 @@ def retrever_test():
     result = dict()
     N = 55393
     idf = []
-    fileREAD = open("SuperIndex.txt", "r")
-    pFile = open('subIndex', 'rb')
-    subIndex = pickle.load(pFile)
-    pFile.close()
-    query = str(input("Enter your search: "))
+
+    # fileREAD = open("SuperIndex.txt", "r")
+    # pFile = open('subIndex', 'rb')
+    # subIndex = pickle.load(pFile)
+    # pFile.close()
+    # query = str(input("Enter your search: "))
     start_time = datetime.datetime.now()
     queries = simple_tokenize(list(set(query.split())))
 
-
     for q in queries:
         postings = simple_search(q, fileREAD, subIndex)
-        if len(postings)>0:
+        if len(postings) > 0:
             idf.append(math.log(N / len(postings)))
-            if len(docids)==0:
-                docids=  set(i[0] for i in postings)
+            if len(docids) == 0:
+                docids = set(i[0] for i in postings)
             else:
                 docids &= set(i[0] for i in postings)
             # print("Posting",postings)
@@ -135,11 +135,12 @@ def retrever_test():
                     if i[0] in ranking.keys():
                         if i not in check_docid:
                             # print(ranking[i[0]],((1 + math.log(i[1])),i[2]))
-                            ranking[i[0]].append(float(i[1])+i[2]*5)
+                            ranking[i[0]].append(float(i[1]) + i[2] * 5)
                         else:
-                            ranking[i[0]][len(ranking[i[0]])-1]=ranking[i[0]][len(ranking[i[0]])-1]+(float(i[1])+i[2]*5)
+                            ranking[i[0]][len(ranking[i[0]]) - 1] = ranking[i[0]][len(ranking[i[0]]) - 1] + (
+                                        float(i[1]) + i[2] * 5)
                     else:
-                        ranking[i[0]]=[float(i[1])+i[2]*5]
+                        ranking[i[0]] = [float(i[1]) + i[2] * 5]
                     check_docid.append(i[0])
                 else:
                     if i[0] in ranking.keys():
@@ -151,8 +152,8 @@ def retrever_test():
         for j in ranking.keys():
             if j in docids:
                 # print(ranking[j][i][0])
-                result[j]=(1+math.log(ranking[j][i]))* idf[i]
-    counter=0
+                result[j] = (1 + math.log(ranking[j][i])) * idf[i]
+    counter = 0
     # print(result)
     # print(idf, ranking,result)
     urlArray.clear()
@@ -168,7 +169,6 @@ def retrever_test():
     execution_time = time_diff.total_seconds() * 1000
     print(execution_time, "ms")
     # fileREAD.close()
-
 
 
 def get_urls(word):
@@ -255,7 +255,7 @@ class Application(Frame):
         # s is the word that the user typed into the search box
         if s:  # if the user has typed in a word in the search box:
             term = s.lower()
-            retriever_test(term, self.file, self.subIndex)
+            retrever_test(term, self.file, self.subIndex)
 
             # go through the array of top 5 urls and create labels that are hyperlinks
             labelIndex = 0
