@@ -164,9 +164,9 @@ def strToList(pList, pString):
 if __name__ == '__main__':
 
     if not os.path.exists("index"):    # Checks for index file
-        print("Error, couldn't find file: index")
+        print("Error, couldn't find index, please run indexer.py first.")
         exit(0)
 
-    myList = search("uci")
-    print(myList)
+    txt_merge()
+    os.remove("index")
 

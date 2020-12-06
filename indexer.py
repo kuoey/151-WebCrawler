@@ -13,7 +13,7 @@ dump_counter = 0
 bigBook = {}
 token_num = set()
 urls={}
-total_words={}
+# total_words={}
 
 
 # class Posting(object):
@@ -52,7 +52,7 @@ def build_index(document):
         data = json.load(f)
         # print(data["content"])
         urls[docid_n]=data["url"]
-        total_words[docid_n]=len(data["content"])
+        # total_words[docid_n]=len(data["content"])
 
     soup = BeautifulSoup(data["content"], 'html.parser')
     # print(soup.prettify())
@@ -100,10 +100,10 @@ def build_index(document):
         pickle.dump(urls, urlfile)
         urlfile.close()
         urls.clear()
-        wordsfile = open("words", 'ab')
-        pickle.dump(total_words, wordsfile)
-        wordsfile.close()
-        total_words.clear()
+        # wordsfile = open("words", 'ab')
+        # pickle.dump(total_words, wordsfile)
+        # wordsfile.close()
+        # total_words.clear()
     f.close()
     print(docid_n, document, len(token_num))
 
@@ -135,9 +135,9 @@ if __name__ == '__main__':
         urlfile = open("urls", 'ab')
         pickle.dump(urls, urlfile)
         urlfile.close()
-        wordsfile = open("words", 'ab')
-        pickle.dump(total_words, wordsfile)
-        wordsfile.close()
+        # wordsfile = open("words", 'ab')
+        # pickle.dump(total_words, wordsfile)
+        # wordsfile.close()
     totalfile= open('total','ab')
     pickle.dump(docid_n,totalfile)
     totalfile.close()
