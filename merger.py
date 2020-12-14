@@ -4,10 +4,11 @@ import pickle
 from PartA import *
 
 
+# TODO JEREMY WILL EXPLAIN
 def get_results(word):
     dbfile = open('index', 'rb')
     results = []
-    while 1:    # Horrible condition, never do this ever ever ever
+    while 1:  # Horrible condition, never do this ever ever ever
         try:
             dict = pickle.load(dbfile)
             if word in dict.keys():
@@ -24,7 +25,7 @@ def get_results(word):
 def pickle_merge():
     oldfile = open('index', 'rb')
     fullBook = {}
-    while 1:    # Horrible condition, never do this ever ever ever
+    while 1:  # Horrible condition, never do this ever ever ever
         try:
             if len(fullBook) == 0:
                 fullBook = pickle.load(oldfile)
@@ -35,7 +36,7 @@ def pickle_merge():
                         fullBook[entry] = fullBook[entry] + sDict[entry]
                     else:
                         fullBook[entry] = sDict[entry]
-                    sDict[entry] = "done"        # Attempt to save on memory
+                    sDict[entry] = "done"  # Attempt to save on memory
                 sDict.clear()
             print("dict saved")
 
@@ -68,20 +69,20 @@ def make_sub_index():
 
 def slow_txt_merge():
     print("Creating sub index")
-    subIndex = make_sub_index()                 # Make index of indexes
-    for entry in subIndex:                      # For each word,
+    subIndex = make_sub_index()  # Make index of indexes
+    for entry in subIndex:  # For each word,
         print("Saving " + entry + " to txt...")
-        results = get_results(entry)            # get the results from the dicts
-        fileOUT = open("SuperIndex.txt", "a")   # and write the word and the entries into a txt
-        fileOUT.write(entry + " ")              # Save the pointer position and number of chars
-        pointer = fileOUT.tell()                # That make up the word's results
+        results = get_results(entry)  # get the results from the dicts
+        fileOUT = open("SuperIndex.txt", "a")  # and write the word and the entries into a txt
+        fileOUT.write(entry + " ")  # Save the pointer position and number of chars
+        pointer = fileOUT.tell()  # That make up the word's results
         fileOUT.write(str(results))
         adv = fileOUT.tell() - pointer
         fileOUT.close()
-        subIndex[entry] = (pointer, adv)        # Save pointer and adv as a pair to use for reading
+        subIndex[entry] = (pointer, adv)  # Save pointer and adv as a pair to use for reading
 
     print("Saving sub index...")
-    newfile = open('subIndex', 'wb')            # Save the sub index to pickle so it can be retrieved again
+    newfile = open('subIndex', 'wb')  # Save the sub index to pickle so it can be retrieved again
     pickle.dump(subIndex, newfile)
     newfile.close()
     subIndex.clear()
@@ -132,7 +133,8 @@ def search(word):
     return myList
 
 
-def simple_search(word, fileREAD, subIndex):    # Word being searched, open file pointer to superindex, and a subindex that is equal to the first load of pickle file
+# Word being searched, open file pointer to superindex, and a subindex that is equal to the first load of pickle file
+def simple_search(word, fileREAD, subIndex):
     aList = []
     if subIndex.get(word) is not None:
         for pair in subIndex[word]:
@@ -163,10 +165,9 @@ def strToList(pList, pString):
 
 if __name__ == '__main__':
 
-    if not os.path.exists("index"):    # Checks for index file
+    if not os.path.exists("index"):  # Checks for index file
         print("Error, couldn't find index, please run indexer.py first.")
         exit(0)
 
     txt_merge()
     os.remove("index")
-

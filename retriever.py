@@ -20,16 +20,14 @@ urlArray = []
 labels = []  # creates an empty list for your labels
 
 
-
-
+# todo Lydia will explain
 def retriever_test(query, fileREAD, subIndex):
     global check_docid
     global urlArray
-    docids=set()
+    docids = set()
     # check_docid=[]
-    ranking=dict()
+    ranking = dict()
     # result=dict()
-    N = 55393
     # idf = []
     # fileREAD = open("SuperIndex.txt", "r")
     # pFile = open('subIndex', 'rb')
@@ -37,14 +35,14 @@ def retriever_test(query, fileREAD, subIndex):
     # pFile.close()
     # query = str(input("Enter your search: "))
     start_time = datetime.datetime.now()
-    queries = simple_tokenize(list(set(query.split())))
+    queries = simple_tokenize(list(set(query.split())))  # part A stuffs
 
     for q in queries:
         postings = simple_search(q, fileREAD, subIndex)
-        if len(postings)>0:
+        if len(postings) > 0:
             # idf.append(math.log(N / len(postings)))
-            if len(docids)==0:
-                docids= set(i[0] for i in postings)
+            if len(docids) == 0:
+                docids = set(i[0] for i in postings)
             else:
                 docids &= set(i[0] for i in postings)
             # print("Posting",postings)
@@ -52,16 +50,16 @@ def retriever_test(query, fileREAD, subIndex):
                 if i[0] in docids:
                     if i[0] in ranking.keys():
                         # if i[0] not in check_docid:
-                            # print(ranking[i[0]],((1 + math.log(i[1])),i[2]))
-                        ranking[i[0]]+=(float(i[1])+i[2]*5*(math.log(N / len(postings))))
+                        # print(ranking[i[0]],((1 + math.log(i[1])),i[2]))
+                        ranking[i[0]] += (float(i[1]) + i[2] * 5 * (math.log(N / len(postings))))
                     else:
-                        ranking[i[0]]=float(i[1])+i[2]*5*(math.log(N / len(postings)))
+                        ranking[i[0]] = float(i[1]) + i[2] * 5 * (math.log(N / len(postings)))
                     # check_docid.append(i[0])
         else:
             print("Nothing found")
-    counter=0
+    counter = 0
     urlArray.clear()
-    for k, v in sorted(ranking.items(), key=lambda item: item[1],reverse=True):
+    for k, v in sorted(ranking.items(), key=lambda item: item[1], reverse=True):
         urlArray.append(get_urls(k))
         counter += 1
         if counter == 5:
@@ -72,15 +70,14 @@ def retriever_test(query, fileREAD, subIndex):
     print(execution_time, "ms")
 
 
-
 def get_urls(word):
     dbfile = open('urls', 'rb')
     results = ""
-    while 1:  # Horrible condition, never do this ever ever ever
+    while 1:  # Horrible condition, never do this ever ever ever ever
         try:
             dict = pickle.load(dbfile)
             if word in dict.keys():
-                results=dict[word]
+                results = dict[word]
                 break
         except(EOFError):
             break
@@ -102,6 +99,7 @@ def get_wordcount(word):
     return results
 
 
+# TODO EXPLAIN ERIC
 # added by eric
 # creates application for GUI
 class Application(Frame):
@@ -148,7 +146,6 @@ class Application(Frame):
         # first destroy any hyperlinks if there are any (from previous search)
         labelsEmpty = len(labels) == 0
 
-
         # returns to widget currently in focus
         s = self.edit.get()
         # s is the word that the user typed into the search box
@@ -182,7 +179,7 @@ class Application(Frame):
 
 # added by eric
 
-
+# used GUI called Tkinter
 if __name__ == '__main__':
     root = Tk()
     root.geometry("1024x576")

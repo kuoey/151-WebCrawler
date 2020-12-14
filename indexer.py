@@ -12,7 +12,9 @@ docid_n = 0
 dump_counter = 0
 bigBook = {}
 token_num = set()
-urls={}
+urls = {}
+
+
 # total_words={}
 
 
@@ -32,10 +34,11 @@ urls={}
 #         self.fields = fields
 #         self.pos = pos
 
-def posting(docid, freq,important,tf_idf):
-    return [docid, freq,important,tf_idf]
+def posting(docid, freq, important, tf_idf):
+    return [docid, freq, important, tf_idf]
 
 
+# todo DJ KHALED WILL DO THIS
 def build_index(document):
     """
     Storing inverted_list as indexer.
@@ -46,49 +49,51 @@ def build_index(document):
     global bigBook
     global dump_counter
     global docid_n
+    # goes through all the json files and initializes the docID
     docid_n += 1
     dump_counter += 1
-    with open(document,encoding = "utf-8")as f:
+    with open(document, encoding="utf-8")as f:  # load the data of the url and store it in the url pickle file
         data = json.load(f)
         # print(data["content"])
-        urls[docid_n]=data["url"]
+        urls[docid_n] = data["url"]
         # total_words[docid_n]=len(data["content"])
 
-    soup = BeautifulSoup(data["content"], 'html.parser')
+    soup = BeautifulSoup(data["content"], 'html.parser')  # get the contents of the json file and make it into soup
     # print(soup.prettify())
     # print(soup.find_all('h1'))
     # print(soup.find_all('h3'))
     # s = soup.get_text()
-    for type in ['body','h1','h2','h3','strong','b']:
+    for type in ['body', 'h1', 'h2', 'h3', 'strong', 'b']:  # represents all the different types of text
         print(type)
         # s= soup.find_all(type)
         # print(s)
-        for s in soup.find_all(type):
+        for s in soup.find_all(type):  # get text(s) from the soup and add its words to our temporary word dict
             wordList = simple_tokenize(s.text.split())
             bigBook = combineFreq(wordList, bigBook)
             b_sorted = sorted(bigBook.items(), reverse=True,
                               key=operator.itemgetter(1))
-            for token, freq in b_sorted:
+            for token, freq in b_sorted:  # take token and freq from the b_sorted list
                 token_num.add(token)
                 if token not in inverted_list.keys():
                     # print(token, freq)
                     inverted_list[token] = list()
-                t=0
-                if type =='body':
-                    t=0
-                if type =='h1':
-                    t=4
-                if type =='h2':
-                    t=3
-                if type =='h3':
-                    t=2
-                if type =='b' or type=='strong':
-                    t=1
-                inverted_list[token].append(posting(docid_n, freq, t, 0))
+                t = 0  # assign different importance according to their text type
+                if type == 'body':
+                    t = 0
+                if type == 'h1':
+                    t = 4
+                if type == 'h2':
+                    t = 3
+                if type == 'h3':
+                    t = 2
+                if type == 'b' or type == 'strong':
+                    t = 1
+                inverted_list[token].append(posting(docid_n, freq, t, 0))  # stores a posting for that token
                 # print(inverted_list[token])
 
             bigBook.clear()
 
+    # after we read 12000 files, store it into pickle file
     if dump_counter == 12000:
         print("dump")
         # writing pickle
@@ -112,21 +117,23 @@ if __name__ == '__main__':
     """
     For M1 testing purpose
     """
-    if os.path.exists("output.txt"):  # Resets the output file
-        os.remove("output.txt")
+    # if os.path.exists("output.txt"):  # Resets the output file
+    #     os.remove("output.txt")
 
     print("Enter directory:")
     directory = input()
+    # for loop is for searching for json files in given directory
     for root, dirs, files in os.walk(directory, topdown=True):
         print(root)
 
         for file in files:
-            if file.endswith('.json'):
+            if file.endswith('.json'):  # for each json file, call the build index function to BUILD THE INDEX
                 build_index(os.path.join(root, file))
 
             else:
                 print(file)
 
+    # for any leftover info in the list, do one more data dump
     if len(inverted_list) != 0:
         dbfile = open('index', 'ab')
         pickle.dump(inverted_list, dbfile)
@@ -138,8 +145,8 @@ if __name__ == '__main__':
         # wordsfile = open("words", 'ab')
         # pickle.dump(total_words, wordsfile)
         # wordsfile.close()
-    totalfile= open('total','ab')
-    pickle.dump(docid_n,totalfile)
+    totalfile = open('total', 'ab')  # stores the total number of files that we went through 
+    pickle.dump(docid_n, totalfile)
     totalfile.close()
 
     print(len(token_num))
